@@ -14,6 +14,22 @@
     <RepositoryUrl>https://github.com/budcribar/RemotePhotino.NET</RepositoryUrl>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Title>RemotePhotinoNET</Title>
+    <RootNamespace>PeakSWC.RemotePhotino.NET</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.15.6" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.36.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.36.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Protobuf Include="Protos\remotephotino.proto" GrpcServices="Client" />
+    <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
+  </ItemGroup>
 
 </Project>
