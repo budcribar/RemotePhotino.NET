@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RemotePhotinoService
+namespace PeakSWC.RemotePhotinoNET
 {
     public class Program
     {

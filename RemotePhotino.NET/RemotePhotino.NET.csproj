@@ -15,6 +15,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Title>RemotePhotinoNET</Title>
     <RootNamespace>PeakSWC.RemotePhotino.NET</RootNamespace>
+	<Nullable>enable</Nullable>
+	<LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <Protobuf Include="Protos\remotephotino.proto" GrpcServices="Client" />
+	  <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Client" Link="Protos\remotephotino.proto" />
     <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 

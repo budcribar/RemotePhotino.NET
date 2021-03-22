@@ -10,14 +10,118 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Google.Protobuf;
 using PhotinoNET;
+using System.Threading.Tasks;
+using System.Reflection;
 
 namespace PeakSWC.RemotePhotinoNET
 {
     public class RemotePhotinoWindow : IPhotinoWindow, IDisposable
     {
-        private RemotePhotinoService.RemotePhotinoServiceClient client = null;
-
+        private RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient? client = null;
+        private readonly Uri uri;
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly string windowTitle;
+        private readonly string hostHtmlPath;
+        private readonly string hostname;
+        private readonly object bootLock = new object();
+
+        private Func<string, Stream?> FrameworkFileResolver { get; } = SupplyFrameworkFile;
+
+        public static Stream? SupplyFrameworkFile(string uri)
+        {
+            try
+            {
+                // TODO
+                if (Path.GetFileName(uri) == "remote.blazor.desktop.js")
+                    return Assembly.GetExecutingAssembly().GetManifestResourceStream("PeakSwc.RemoteableWebWindows.remote.blazor.desktop.js");
+
+                if (File.Exists(uri))
+                    return File.OpenRead(uri);
+            }
+            catch (Exception) { return null; }
+
+            return null;
+        }
+
+        private RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient Client
+        {
+            get
+            {
+                if (client == null)
+                {
+                    var channel = GrpcChannel.ForAddress(uri);
+
+                    client = new RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient(channel);
+                    var events = client.CreateWebWindow(new CreateWebWindowRequest { Id = Id.ToString(), HtmlHostPath = hostHtmlPath, Hostname = hostname }, cancellationToken: cts.Token); // TODO parameter names
+                    var completed = new ManualResetEventSlim();
+
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await foreach (var message in events.ResponseStream.ReadAllAsync())
+                            {
+                                var command = message.Response.Split(':')[0];
+                                var data = message.Response.Substring(message.Response.IndexOf(':') + 1);
+
+                                switch (command)
+                                {
+                                    case "created":
+                                        completed.Set();
+                                        break;
+                                    case "webmessage":
+                                        if (data == "booted:")
+                                        {
+                                            lock (bootLock)
+                                            {
+                                                Shutdown();
+                                                WindowClosing?.Invoke(this, new());
+                                            }
+                                        }
+                                        else if (data == "connected:")
+                                            WindowCreated?.Invoke(this,new());
+
+                                        else
+                                            OnWebMessageReceived(data);
+                                        break;
+
+
+                                }
+
+                            }
+                        }
+                        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+                        {
+                            OnWindowClosing();
+                            Console.WriteLine("Stream cancelled.");  //TODO
+                        }
+                    }, cts.Token);
+
+                    completed.Wait();
+
+                    Task.Run(async () =>
+                    {
+                        var files = client.FileReader();
+
+                        await files.RequestStream.WriteAsync(new FileReadRequest { Id = Id.ToString(), Path = "Initialize" });
+
+                        await foreach (var message in files.ResponseStream.ReadAllAsync())
+                        {
+                            var bytes = FrameworkFileResolver(message.Path) ?? null;
+                            await files.RequestStream.WriteAsync(new FileReadRequest { Id = Id.ToString(), Path = message.Path, Data = bytes == null ? null : ByteString.FromStream(bytes) });
+                        }
+
+                    }, cts.Token);
+
+                }
+                return client;
+            }
+        }
+
+        private void Shutdown()
+        {
+            Client.Shutdown(new IdMessageRequest { Id = Id.ToString() });
+        }
 
         #region TODO
 
@@ -259,8 +363,9 @@ namespace PeakSWC.RemotePhotinoNET
 
         public event EventHandler<Size> SizeChanged;
         public event EventHandler<Point> LocationChanged;
-
         public event EventHandler<string> WebMessageReceived;
+
+        //public event EventHandler<string> ;
 
         /// <summary>
         /// Creates a new PhotinoWindow instance with
@@ -1201,7 +1306,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnWebMessageReceived(string message)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnMWebessageReceived(string message)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnMWebessageReceived(string message)");
 
             this.WebMessageReceived?.Invoke(this, message);
         }

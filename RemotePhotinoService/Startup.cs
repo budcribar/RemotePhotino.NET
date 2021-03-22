@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RemotePhotinoService
+namespace PeakSWC.RemotePhotinoNET
 {
     public class Startup
     {
@@ -31,7 +31,7 @@ namespace RemotePhotinoService
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GreeterService>();
+                endpoints.MapGrpcService<RemotePhotinoService>();
 
                 endpoints.MapGet("/", async context =>
                 {

@@ -35,6 +35,7 @@ message CreateWebWindowRequest {
   string id = 1;
   string title = 2;
   string htmlHostPath = 3;
+  string hostname = 4;
 }
 
 message WebMessageResponse {
@@ -119,7 +120,7 @@ message MonitorResponse {
     repeated Instance instances = 1;
 }
 
-service RemotePhotinoService {
+service RemotePhotinoServiceProto {
     rpc GetHeight(IdMessageRequest) returns (IntMessageResponse);
     rpc SetHeight(IntMessageRequest) returns (google.protobuf.Empty);
 
@@ -165,5 +166,6 @@ service RemotePhotinoService {
 
     rpc CreateWebWindow(CreateWebWindowRequest) returns (stream WebMessageResponse);
     rpc FileReader(stream FileReadRequest) returns (stream FileReadResponse);  
+    rpc Shutdown(IdMessageRequest) returns (google.protobuf.Empty); 
 
 }

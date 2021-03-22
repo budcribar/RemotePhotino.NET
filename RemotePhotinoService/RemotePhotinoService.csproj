@@ -2,14 +2,39 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+	<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+	<OutputType>Exe</OutputType>
+	 <!--
+	<Platforms>x64</Platforms>
+	-->
+	<Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<PackAsTool>true</PackAsTool>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<PackageId>PeakSWC.RemotePhotinoService</PackageId>
+	<ToolCommandName>RemotePhotinoService</ToolCommandName>
+	<Authors>Bud Cribar</Authors>
+	<Company>Peak Software Consulting, LLC</Company>
+	<Description>This package will transport the user interface from an app built using RemotePhotino.net to a server running in the cloud. This allows an app running behind a firewall to be accessed by browing to a web server hosted in the cloud.</Description>
+	<Copyright>Peak Software Consulting, LLC</Copyright>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageIcon>favico-32x32.png</PackageIcon>
+	<RepositoryUrl>https://github.com/budcribar/RemotePhotino.NET</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageTags>BlazorWebView, Blazor, WebView</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+	<Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Server" Link="Protos\remotephotino.proto" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 
 </Project>
