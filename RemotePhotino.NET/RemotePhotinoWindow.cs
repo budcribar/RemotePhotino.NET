@@ -149,7 +149,12 @@ namespace PeakSWC.RemotePhotinoNET
             return this;
         }
 
+        public IntPtr WindowHandle => throw new NotImplementedException();
+       
+        public IPhotinoWindow Parent => throw new NotImplementedException();
 
+        public List<IPhotinoWindow> Children { get; } = new();
+       
 
         #region TODO
 
@@ -163,24 +168,8 @@ namespace PeakSWC.RemotePhotinoNET
         private Point _lastLocation;
 
         // API Members
-        private IPhotinoWindow _parent;
-        public IPhotinoWindow Parent {
-            get => _parent;
-            private set
-            {
-                _parent = value;
-            }
-        }
-
-        private List<IPhotinoWindow> _children = new List<IPhotinoWindow>();
-        public List<IPhotinoWindow> Children
-        {
-            get => _children;
-            set
-            {
-                _children = value;
-            }
-        }
+       
+       
 
       
 
@@ -376,7 +365,7 @@ namespace PeakSWC.RemotePhotinoNET
         public static bool IsMacOsPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         public static bool IsLinuxPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-        public IntPtr WindowHandle => throw new NotImplementedException();
+        
 
         IReadOnlyList<PhotinoNET.Structs.Monitor> IPhotinoWindow.Monitors => throw new NotImplementedException();
 
@@ -446,7 +435,7 @@ namespace PeakSWC.RemotePhotinoNET
             this.Title = title;
 
             //_id = Guid.NewGuid();
-            _parent = options.Parent;
+            //_parent = options.Parent;
             //_nativeInstance = Photino_ctor(_title, (_parent as RemotePhotinoWindow)?._nativeInstance ?? default, onWebMessageReceivedDelegate, fullscreen, left, top, width, height);
 
             // Register handlers that depend on an existing
@@ -461,11 +450,11 @@ namespace PeakSWC.RemotePhotinoNET
             //Invoke(() => Photino_SetClosingCallback(_nativeInstance, onClosingDelegate));
 
             // Manage parent / child relationship
-            if (_parent != null)
-            {
-                this.Parent = _parent;
-                this.Parent.AddChild(this);
-            }
+            //if (_parent != null)
+            //{
+            //    this.Parent = _parent;
+            //    this.Parent.AddChild(this);
+            //}
 
             // Fire post-create event handlers
             this.OnWindowCreated();

@@ -70,5 +70,10 @@ namespace PeakSWC.RemotePhotinoNET
             return Task.FromResult<Empty>(new Empty());
         }
 
+        public override Task<Empty> NavigateToUrl(UrlMessageRequest request, ServerCallContext context)
+        {
+            return base.NavigateToUrl(request, context);
+        }
+
     }
 }
