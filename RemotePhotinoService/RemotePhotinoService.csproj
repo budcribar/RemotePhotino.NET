@@ -25,12 +25,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Server" Link="Protos\remotephotino.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Server" Link="Protos\remotephotino.proto" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.36.0" />
+    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.36.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>

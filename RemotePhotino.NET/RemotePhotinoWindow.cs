@@ -12,6 +12,7 @@ using Google.Protobuf;
 using PhotinoNET;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Net;
 
 namespace PeakSWC.RemotePhotinoNET
 {
@@ -26,6 +27,16 @@ namespace PeakSWC.RemotePhotinoNET
         private readonly object bootLock = new object();
 
         private Func<string, Stream?> FrameworkFileResolver { get; } = SupplyFrameworkFile;
+
+        public Guid Id { get; set; }
+
+        // EventHandlers
+        public event EventHandler WindowCreating;
+        public event EventHandler WindowCreated;
+        public event EventHandler WindowClosing;
+        public event EventHandler<Size> SizeChanged;
+        public event EventHandler<Point> LocationChanged;
+        public event EventHandler<string> WebMessageReceived;
 
         public static Stream? SupplyFrameworkFile(string uri)
         {
@@ -123,12 +134,29 @@ namespace PeakSWC.RemotePhotinoNET
             Client.Shutdown(new IdMessageRequest { Id = Id.ToString() });
         }
 
+        /// <summary>
+        /// Send a message to the window's JavaScript context.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
+        /// <returns>The current IPhotinoWindow instance.</returns>
+        public IPhotinoWindow SendWebMessage(string message)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".SendWebMessage(string message)");
+
+            Client.SendMessage(new SendMessageRequest { Id = Id.ToString(), Message = message }, new());
+
+            return this;
+        }
+
+
+
         #region TODO
 
-        private readonly IntPtr _nativeInstance;
-        private readonly int _managedThreadId;
-        private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
-        private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
+        //private readonly IntPtr _nativeInstance;
+        //private readonly int _managedThreadId;
+        //private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
+        //private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
 
         // Internal State
         private Size _lastSize;
@@ -154,8 +182,7 @@ namespace PeakSWC.RemotePhotinoNET
             }
         }
 
-        private Guid _id;
-        public Guid Id => _id;
+      
 
         private string _title;
         public string Title
@@ -355,15 +382,7 @@ namespace PeakSWC.RemotePhotinoNET
 
         PhotinoNET.Structs.Monitor IPhotinoWindow.MainMonitor => throw new NotImplementedException();
 
-        // EventHandlers
-        public event EventHandler WindowCreating;
-        public event EventHandler WindowCreated;
         
-        public event EventHandler WindowClosing;
-
-        public event EventHandler<Size> SizeChanged;
-        public event EventHandler<Point> LocationChanged;
-        public event EventHandler<string> WebMessageReceived;
 
         //public event EventHandler<string> ;
 
@@ -383,15 +402,23 @@ namespace PeakSWC.RemotePhotinoNET
         /// <param name="top">The position from the top side of the screen</param>
         /// <param name="fullscreen">Open window in fullscreen mode</param>
         public RemotePhotinoWindow(
+            Uri uri,
+            string hostHtmlPath,
             string title,
-            Action<PhotinoWindowOptions> configure = null,
+            Guid id = default,
+            Action<PhotinoWindowOptions>? configure = null,
             int width = 800,
             int height = 600,
             int left = 20,
             int top = 20,
             bool fullscreen = false)
         {
-            _managedThreadId = Thread.CurrentThread.ManagedThreadId;
+            this.uri = uri;
+            this.Id = id == default(Guid) ? Guid.NewGuid() : id;
+            this.hostHtmlPath = hostHtmlPath;
+            this.hostname = Dns.GetHostName();
+
+            //_managedThreadId = Thread.CurrentThread.ManagedThreadId;
 
             // Native Interop Events
             //var onClosingDelegate = (ClosingDelegate)this.OnClosing;
@@ -418,7 +445,7 @@ namespace PeakSWC.RemotePhotinoNET
             // Create window
             this.Title = title;
 
-            _id = Guid.NewGuid();
+            //_id = Guid.NewGuid();
             _parent = options.Parent;
             //_nativeInstance = Photino_ctor(_title, (_parent as RemotePhotinoWindow)?._nativeInstance ?? default, onWebMessageReceivedDelegate, fullscreen, left, top, width, height);
 
@@ -444,25 +471,6 @@ namespace PeakSWC.RemotePhotinoNET
             this.OnWindowCreated();
         }
 
-        static RemotePhotinoWindow()
-        {
-            // Workaround for a crashing issue on Linux. Without this, applications
-            // are crashing when running in Debug mode (but not Release) if the very
-            // first line of code in Program::Main references the PhotinoWindow type.
-            // It's unclear why.
-            Thread.Sleep(1);
-
-            //if (RemotePhotinoWindow.IsWindowsPlatform)
-            //{
-            //    var hInstance = Marshal.GetHINSTANCE(typeof(RemotePhotinoWindow).Module);
-            //    Photino_register_win32(hInstance);
-            //}
-            //else if (RemotePhotinoWindow.IsMacOsPlatform)
-            //{
-            //    Photino_register_mac();
-            //}
-        }
-
         /// <summary>
         /// PhotinoWindow Destructor
         /// </summary>
@@ -475,18 +483,18 @@ namespace PeakSWC.RemotePhotinoNET
         /// Dispatches an Action to the UI thread.
         /// </summary>
         /// <param name="workItem"></param>
-        private void Invoke(Action workItem)
-        {
-            // If we're already on the UI thread, no need to dispatch
-            if (Thread.CurrentThread.ManagedThreadId == _managedThreadId)
-            {
-                workItem();
-            }
-            else
-            {
-                //Photino_Invoke(_nativeInstance, workItem.Invoke);
-            }
-        }
+        //private void Invoke(Action workItem)
+        //{
+        //    // If we're already on the UI thread, no need to dispatch
+        //    if (Thread.CurrentThread.ManagedThreadId == _managedThreadId)
+        //    {
+        //        workItem();
+        //    }
+        //    else
+        //    {
+        //        //Photino_Invoke(_nativeInstance, workItem.Invoke);
+        //    }
+        //}
 
         // Does not get called when window is closed using
         // the UI close button of the window chrome.
@@ -513,17 +521,17 @@ namespace PeakSWC.RemotePhotinoNET
 
             //Photino_dtor(_nativeInstance);
 
-            foreach (var gcHandle in _gcHandlesToFree)
-            {
-                gcHandle.Free();
-            }
-            _gcHandlesToFree.Clear();
+            //foreach (var gcHandle in _gcHandlesToFree)
+            //{
+            //    gcHandle.Free();
+            //}
+            //_gcHandlesToFree.Clear();
 
-            foreach (var handle in _hGlobalToFree)
-            {
-                Marshal.FreeHGlobal(handle);
-            }
-            _hGlobalToFree.Clear();
+            //foreach (var handle in _hGlobalToFree)
+            //{
+            //    Marshal.FreeHGlobal(handle);
+            //}
+            //_hGlobalToFree.Clear();
         }
 
         /// <summary>
@@ -974,7 +982,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Load(string path)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Load(string path)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Load(string path)");
             
             // ––––––––––––––––––––––
             // SECURITY RISK!
@@ -1047,20 +1055,7 @@ namespace PeakSWC.RemotePhotinoNET
             return this;
         }
 
-        /// <summary>
-        /// Send a message to the window's JavaScript context.
-        /// </summary>
-        /// <param name="message">The message to send.</param>
-        /// <returns>The current IPhotinoWindow instance.</returns>
-        public IPhotinoWindow SendWebMessage(string message)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".SendWebMessage(string message)");
-            
-            //Invoke(() => Photino_SendWebMessage(_nativeInstance, message));
-
-            return this;
-        }
+        
 
         /// <summary>
         /// Register event handlers from options on window init,

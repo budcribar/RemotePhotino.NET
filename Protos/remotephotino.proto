@@ -169,3 +169,10 @@ service RemotePhotinoServiceProto {
     rpc Shutdown(IdMessageRequest) returns (google.protobuf.Empty); 
 
 }
+
+service BrowserIPC {
+    rpc ReceiveMessage(IdMessageRequest) returns (stream StringRequest);
+    rpc SendMessage(StringRequest) returns (google.protobuf.Empty);
+    rpc GetHeight(IdMessageRequest) returns (IntMessageResponse);
+
+}
