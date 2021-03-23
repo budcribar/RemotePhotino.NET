@@ -13,6 +13,7 @@ using PhotinoNET;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Net;
+using Microsoft.JSInterop;
 
 namespace PeakSWC.RemotePhotinoNET
 {
@@ -154,7 +155,20 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Parent => throw new NotImplementedException();
 
         public List<IPhotinoWindow> Children { get; } = new();
-       
+
+        public IJSRuntime JSRuntime { get; set; }
+
+        public string Title
+        {
+            get => JSRuntime.InvokeAsync<string>("RemotePhotino.title").Result;
+            set
+            {
+                if (string.IsNullOrEmpty(value.Trim()))
+                    value = "Untitled Window";
+                JSRuntime.InvokeVoidAsync("RemotePhotino.setTitle", new object[] { value.Trim() });
+            }
+        }
+
 
         #region TODO
 
@@ -166,33 +180,6 @@ namespace PeakSWC.RemotePhotinoNET
         // Internal State
         private Size _lastSize;
         private Point _lastLocation;
-
-        // API Members
-       
-       
-
-      
-
-        private string _title;
-        public string Title
-        {
-            get => _title;
-            set
-            {
-                if (string.IsNullOrEmpty(value.Trim()))
-                {
-                    value = "Untitled Window";
-                }
-
-                // Due to Linux/Gtk platform limitations, the window title has to be no more than 31 chars
-                if (value.Length > 31 && IsLinuxPlatform)
-                {
-                    value = value.Substring(0, 31);
-                }
-
-                _title = value;
-            }
-        }
 
         private bool _resizable = true;
         public bool Resizable
