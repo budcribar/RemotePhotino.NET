@@ -156,7 +156,6 @@ namespace PeakSWC.RemotePhotinoNET
        
         public IPhotinoWindow Parent => throw new NotImplementedException();
 
-        public bool Resizable => throw new NotImplementedException();
 
         public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors => throw new NotImplementedException();
 
@@ -381,11 +380,276 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Hide()
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Hide()");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Hide()");
 
             throw new NotImplementedException("Hide is not yet implemented in PhotinoNET.");
         }
 
+        public bool Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Resizes the current window instance using a Size struct.
+        /// </summary>
+        /// <param name="size">The Size struct for the window containing width and height</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Resize(Size size)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Resize(Size size)");
+
+            if (LogVerbosity > 2)
+            {
+                Console.WriteLine($"Current size: {this.Size}");
+                Console.WriteLine($"New size: {size}");
+            }
+
+            // Save last size
+            _lastSize = this.Size;
+
+            // Don't allow window size values smaller than 0px
+            if (size.Width <= 0 || size.Height <= 0)
+            {
+                throw new ArgumentOutOfRangeException($"Window width and height must be greater than 0. (Invalid Size: {size}.)");
+            }
+
+            // Don't allow window to be bigger than work area
+            // TODO
+            //Size workArea = this.MainMonitor.WorkArea.Size;
+            //size = new Size(
+            //    size.Width <= workArea.Width ? size.Width : workArea.Width,
+            //    size.Height <= workArea.Height ? size.Height : workArea.Height
+            //);
+
+            this.Size = size;
+
+            return this;
+        }
+        /// <summary>
+        /// Resizes the current window instance using width and height.
+        /// </summary>
+        /// <param name="width">The width for the window</param>
+        /// <param name="height">The height for the window</param>
+        /// <param name="unit">Unit of the given dimensions: px (default), %, percent</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Resize(int width, int height, string unit = "px")
+        {
+            // TODO bad log message
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Resize(int width, int height, bool isPercentage)");
+
+            Size size;
+
+            switch (unit)
+            {
+                case "px":
+                case "pixel":
+                    size = new Size(width, height);
+
+                    break;
+                case "%":
+                case "percent":
+                case "percentage":
+                    // Check if the given values are in range. Prevents divide by zero.
+                    if (width < 1 || width > 100)
+                    {
+                        throw new ArgumentOutOfRangeException("Resize width % must be between 1 and 100.");
+                    }
+
+                    if (height < 1 || height > 100)
+                    {
+                        throw new ArgumentOutOfRangeException("Resize height % must be between 1 and 100.");
+                    }
+
+                    // TODO MainMonitor will throw exception
+                    // Calculate window size based on main monitor work area
+                    size = new Size
+                    {
+                        Width = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Width / 100 * width), 0),
+                        Height = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Height / 100 * height), 0)
+                    };
+
+                    break;
+                default:
+                    throw new ArgumentException($"Unit \"{unit}\" is not a valid unit for window resize.");
+            }
+
+            return this.Resize(size);
+        }
+
+        /// <summary>
+        /// Minimizes the window into the system tray.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Minimize()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Minimize()");
+
+            throw new NotImplementedException("Minimize is not yet implemented in PhotinoNET.");
+        }
+        /// <summary>
+        /// Maximizes the window to fill the work area.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Maximize()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Maximize()");
+
+            // TODO MainMonitor will throw exception
+            Size workArea = this.MainMonitor.WorkArea.Size;
+
+            return this
+                .MoveTo(0, 0)
+                .Resize(workArea.Width, workArea.Height);
+        }
+
+
+        /// <summary>
+        /// Makes the window fill the whole screen area 
+        /// without borders or OS interface.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Fullscreen()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Fullscreen()");
+
+            throw new NotImplementedException("Fullscreen is not yet implemented in PhotinoNET.");
+        }
+        /// <summary>
+        /// Restores the previous window size and position.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Restore()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Restore()");
+
+            if (LogVerbosity > 2)
+            {
+                Console.WriteLine($"Last location: {_lastLocation}");
+                Console.WriteLine($"Last size: {_lastSize}");
+            }
+
+            bool isRestorable = _lastSize.Width > 0 && _lastSize.Height > 0;
+
+            if (isRestorable == false)
+            {
+                if (LogVerbosity > 0)
+                    Console.WriteLine("Can't restore previous window state.");
+                return this;
+            }
+
+            return this
+                .Resize(_lastSize)
+                .MoveTo(_lastLocation, true); // allow moving to outside work area in case the previous window Rect was outside.
+        }
+        /// <summary>
+        /// Moves the window to the specified location 
+        /// on the screen using a Point struct.
+        /// </summary>
+        /// <param name="location">The Point struct defining the window location</param>
+        /// <param name="allowOutsideWorkArea">Allow the window to move outside the work area of the monitor</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow MoveTo(Point location, bool allowOutsideWorkArea = false)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Move(Point location)");
+
+            if (LogVerbosity > 2)
+            {
+                Console.WriteLine($"Current location: {this.Location}");
+                Console.WriteLine($"New location: {location}");
+            }
+
+            // Save last location
+            _lastLocation = this.Location;
+
+            // Check if the window is within the work area.
+            // If the window is outside of the work area,
+            // recalculate the position and continue.
+            if (allowOutsideWorkArea == false)
+            {
+                // TODO MainMonitor will throw exception
+                int horizontalWindowEdge = location.X + this.Width; // x position + window width
+                int verticalWindowEdge = location.Y + this.Height; // y position + window height
+
+                int horizontalWorkAreaEdge = this.MainMonitor.WorkArea.Width; // like 1920 (px)
+                int verticalWorkAreaEdge = this.MainMonitor.WorkArea.Height; // like 1080 (px)
+
+                bool isOutsideHorizontalWorkArea = horizontalWindowEdge > horizontalWorkAreaEdge;
+                bool isOutsideVerticalWorkArea = verticalWindowEdge > verticalWorkAreaEdge;
+
+                Point locationInsideWorkArea = new(
+                    isOutsideHorizontalWorkArea ? horizontalWorkAreaEdge - this.Width : location.X,
+                    isOutsideVerticalWorkArea ? verticalWorkAreaEdge - this.Height : location.Y
+                );
+
+                location = locationInsideWorkArea;
+            }
+
+            this.Location = location;
+
+            return this;
+        }
+        /// <summary>
+        /// Moves the window relative to its current location
+        /// on the screen using a Point struct.
+        /// </summary>
+        /// <param name="offset">The Point struct defining the location offset</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Offset(Point offset)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Offset(Point offset)");
+
+            Point location = this.Location;
+
+            int left = location.X + offset.X;
+            int top = location.Y + offset.Y;
+
+            return this.MoveTo(left, top);
+        }
+
+        /// <summary>
+        /// Moves the window relative to its current location
+        /// on the screen using left and top coordinates.
+        /// </summary>
+        /// <param name="left">The location offset from the left</param>
+        /// <param name="top">The location offset from the top</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Offset(int left, int top)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Offset(int left, int top)");
+
+            return this.Offset(new Point(left, top));
+        }
+
+        /// <summary>
+        /// Closes the current IPhotinoWindow instance. Also closes
+        /// all children of the current IPhotinoWindow instance.
+        /// </summary>
+        public void Close()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Close()");
+
+            // TODO
+        }
+
+        /// <summary>
+        /// Wait for the current window to close and send exit
+        /// signal to the native WebView instance.
+        /// </summary>
+        public void WaitForClose()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".WaitForClose()");
+
+            //Invoke(() => Photino_WaitForExit(_nativeInstance));
+        }
 
         #region TODO
 
@@ -396,13 +660,6 @@ namespace PeakSWC.RemotePhotinoNET
         public static bool IsWindowsPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         public static bool IsMacOsPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         public static bool IsLinuxPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
-        bool IPhotinoWindow.Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-
-
-
-
 
         //public event EventHandler<string> ;
 
@@ -564,236 +821,20 @@ namespace PeakSWC.RemotePhotinoNET
         
 
        
-        /// <summary>
-        /// Closes the current IPhotinoWindow instance. Also closes
-        /// all children of the current IPhotinoWindow instance.
-        /// </summary>
-        public void Close()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Close()");
+       
 
-            //Invoke(() => Photino_Close(_nativeInstance));
-        }
-
-        /// <summary>
-        /// Wait for the current window to close and send exit
-        /// signal to the native WebView instance.
-        /// </summary>
-        public void WaitForClose()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".WaitForClose()");
-
-            //Invoke(() => Photino_WaitForExit(_nativeInstance));
-        }
+        
 
        
 
-        /// <summary>
-        /// Resizes the current window instance using a Size struct.
-        /// </summary>
-        /// <param name="size">The Size struct for the window containing width and height</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Resize(Size size)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Resize(Size size)");
+       
+       
 
-            if (LogVerbosity > 2)
-            {
-                Console.WriteLine($"Current size: {this.Size}");
-                Console.WriteLine($"New size: {size}");
-            }
+       
 
-            // Save last size
-            _lastSize = this.Size;
-
-            // Don't allow window size values smaller than 0px
-            if (size.Width <= 0 || size.Height <= 0)
-            {
-                throw new ArgumentOutOfRangeException($"Window width and height must be greater than 0. (Invalid Size: {size}.)");
-            }
-
-            // Don't allow window to be bigger than work area
-            Size workArea = this.MainMonitor.WorkArea.Size;
-            size = new Size(
-                size.Width <= workArea.Width ? size.Width :  workArea.Width,
-                size.Height <= workArea.Height ? size.Height : workArea.Height
-            );
-
-            this.Size = size;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Resizes the current window instance using width and height.
-        /// </summary>
-        /// <param name="width">The width for the window</param>
-        /// <param name="height">The height for the window</param>
-        /// <param name="unit">Unit of the given dimensions: px (default), %, percent</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Resize(int width, int height, string unit = "px")
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Resize(int width, int height, bool isPercentage)");
-
-            Size size;
-
-            switch (unit) {
-                case "px":
-                case "pixel":
-                    size = new Size(width, height);
-
-                    break;
-                case "%":
-                case "percent":
-                case "percentage":
-                    // Check if the given values are in range. Prevents divide by zero.
-                    if (width < 1 || width > 100)
-                    {
-                        throw new ArgumentOutOfRangeException("Resize width % must be between 1 and 100.");
-                    }
-                    
-                    if (height < 1 || height > 100)
-                    {
-                        throw new ArgumentOutOfRangeException("Resize height % must be between 1 and 100.");
-                    }
-
-                    // Calculate window size based on main monitor work area
-                    size = new Size
-                    {
-                        Width = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Width / 100 * width), 0),
-                        Height = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Height / 100 * height), 0)
-                    };
-
-                    break;
-                default:
-                    throw new ArgumentException($"Unit \"{unit}\" is not a valid unit for window resize.");
-            }
-            
-            return this.Resize(size);
-        }
-
-        /// <summary>
-        /// Minimizes the window into the system tray.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Minimize()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Minimize()");
-            
-            throw new NotImplementedException("Minimize is not yet implemented in PhotinoNET.");
-        }
-
-        /// <summary>
-        /// Maximizes the window to fill the work area.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Maximize()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Maximize()");
-
-            Size workArea = this.MainMonitor.WorkArea.Size;
-
-            return this
-                .MoveTo(0, 0)
-                .Resize(workArea.Width, workArea.Height);
-        }
-
-
-        /// <summary>
-        /// Makes the window fill the whole screen area 
-        /// without borders or OS interface.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Fullscreen()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Fullscreen()");
-            
-            throw new NotImplementedException("Fullscreen is not yet implemented in PhotinoNET.");
-        }
-
-        /// <summary>
-        /// Restores the previous window size and position.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Restore()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Restore()");
-
-            if (LogVerbosity > 2)
-            {
-                Console.WriteLine($"Last location: {_lastLocation}");
-                Console.WriteLine($"Last size: {_lastSize}");
-            }
-
-            bool isRestorable = _lastSize.Width > 0 && _lastSize.Height > 0;
-
-            if (isRestorable == false)
-            {
-                if (LogVerbosity > 0)
-                    Console.WriteLine("Can't restore previous window state.");
-                return this;
-            }
-
-            return this
-                .Resize(_lastSize)
-                .MoveTo(_lastLocation, true); // allow moving to outside work area in case the previous window Rect was outside.
-        }
-
-        /// <summary>
-        /// Moves the window to the specified location 
-        /// on the screen using a Point struct.
-        /// </summary>
-        /// <param name="location">The Point struct defining the window location</param>
-        /// <param name="allowOutsideWorkArea">Allow the window to move outside the work area of the monitor</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow MoveTo(Point location, bool allowOutsideWorkArea = false)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Move(Point location)");
-
-            if (LogVerbosity > 2)
-            {
-                Console.WriteLine($"Current location: {this.Location}");
-                Console.WriteLine($"New location: {location}");
-            }
-
-            // Save last location
-            _lastLocation = this.Location;
-
-            // Check if the window is within the work area.
-            // If the window is outside of the work area,
-            // recalculate the position and continue.
-            if (allowOutsideWorkArea == false)
-            {
-                int horizontalWindowEdge = location.X + this.Width; // x position + window width
-                int verticalWindowEdge = location.Y + this.Height; // y position + window height
-
-                int horizontalWorkAreaEdge = this.MainMonitor.WorkArea.Width; // like 1920 (px)
-                int verticalWorkAreaEdge = this.MainMonitor.WorkArea.Height; // like 1080 (px)
-
-                bool isOutsideHorizontalWorkArea = horizontalWindowEdge > horizontalWorkAreaEdge;
-                bool isOutsideVerticalWorkArea = verticalWindowEdge > verticalWorkAreaEdge;
-
-                Point locationInsideWorkArea = new(
-                    isOutsideHorizontalWorkArea ? horizontalWorkAreaEdge - this.Width : location.X,
-                    isOutsideVerticalWorkArea ? verticalWorkAreaEdge - this.Height : location.Y
-                );
-
-                location = locationInsideWorkArea;
-            }
-
-            this.Location = location;
-
-            return this;
-        }
+        
+        
+      
 
         /// <summary>
         /// Moves the window to the specified location
@@ -806,45 +847,12 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow MoveTo(int left, int top, bool allowOutsideWorkArea = false)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Move(int left, int top)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Move(int left, int top)");
             
             return this.MoveTo(new Point(left, top), allowOutsideWorkArea);
         }
 
-        /// <summary>
-        /// Moves the window relative to its current location
-        /// on the screen using a Point struct.
-        /// </summary>
-        /// <param name="offset">The Point struct defining the location offset</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Offset(Point offset)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Offset(Point offset)");
-            
-            Point location = this.Location;
-
-            int left = location.X + offset.X;
-            int top = location.Y + offset.Y;
-
-            return this.MoveTo(left, top);
-        }
-
-        /// <summary>
-        /// Moves the window relative to its current location
-        /// on the screen using left and top coordinates.
-        /// </summary>
-        /// <param name="left">The location offset from the left</param>
-        /// <param name="top">The location offset from the top</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Offset(int left, int top)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Offset(int left, int top)");
-            
-            return this.Offset(new Point(left, top));
-        }
-
+       
         /// <summary>
         /// Centers the window on the main monitor work area.
         /// </summary>
@@ -852,7 +860,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Center()
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Center()");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Center()");
 
             Size workAreaSize = this.MainMonitor.WorkArea.Size;
 
@@ -872,7 +880,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Load(Uri uri)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Load(Uri uri)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Load(Uri uri)");
 
             // Navigation only works after the window was shown once.
             if (this.WasShown == false)
@@ -938,7 +946,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow LoadRawString(string content)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".LoadRawString(string content)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".LoadRawString(string content)");
 
             // Navigation only works after the window was shown once.
             if (this.WasShown == false)
@@ -960,7 +968,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow OpenAlertWindow(string title, string message)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OpenAlertWindow(string title, string message)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OpenAlertWindow(string title, string message)");
             
             // Bug:
             // Closing the message shown with the OpenAlertWindow
@@ -1020,7 +1028,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow RegisterWindowClosingHandler(EventHandler handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterWindowClosingHandler(EventHandler handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterWindowClosingHandler(EventHandler handler)");
             
             this.WindowClosing += handler;
 
@@ -1038,7 +1046,7 @@ namespace PeakSWC.RemotePhotinoNET
         private IPhotinoWindow RegisterWindowCreatingHandler(EventHandler handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterWindowCreatingHandler(EventHandler handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterWindowCreatingHandler(EventHandler handler)");
             
             this.WindowCreating += handler;
 
@@ -1054,7 +1062,7 @@ namespace PeakSWC.RemotePhotinoNET
         private IPhotinoWindow RegisterWindowCreatedHandler(EventHandler handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterWindowCreatedHandler(EventHandler handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterWindowCreatedHandler(EventHandler handler)");
             
             this.WindowCreated += handler;
 
@@ -1125,7 +1133,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow RegisterSizeChangedHandler(EventHandler<Size> handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterSizeChangedHandler(EventHandler<Size> handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterSizeChangedHandler(EventHandler<Size> handler)");
             
             this.SizeChanged += handler;
 
@@ -1140,7 +1148,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow RegisterLocationChangedHandler(EventHandler<Point> handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterLocationChangedHandler(EventHandler<Point> handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterLocationChangedHandler(EventHandler<Point> handler)");
             
             this.LocationChanged += handler;
 
@@ -1155,7 +1163,7 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow RegisterWebMessageReceivedHandler(EventHandler<string> handler)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RegisterWebMessageReceivedHandler(EventHandler<string> handler)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".RegisterWebMessageReceivedHandler(EventHandler<string> handler)");
             
             this.WebMessageReceived += handler;
 
@@ -1166,7 +1174,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnWindowCreating()
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnWindowCreating()");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowCreating()");
 
             this.WindowCreating?.Invoke(this, null);
         }
@@ -1174,7 +1182,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnWindowCreated()
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnWindowCreated()");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowCreated()");
 
             this.WindowCreated?.Invoke(this, null);
         }
@@ -1182,7 +1190,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnWindowClosing()
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnWindowClosing()");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowClosing()");
 
             this.WindowClosing?.Invoke(this, null);
         }
@@ -1200,7 +1208,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnSizeChanged(int width, int height)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnSizeChanged(int width, int height)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnSizeChanged(int width, int height)");
 
             this.SizeChanged?.Invoke(this, new Size(width, height));
         }
@@ -1208,7 +1216,7 @@ namespace PeakSWC.RemotePhotinoNET
         private void OnLocationChanged(int left, int top)
         {
             if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".OnLocationChanged(int left, int top)");
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnLocationChanged(int left, int top)");
 
             this.LocationChanged?.Invoke(this, new Point(left, top));
         }
