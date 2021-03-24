@@ -21,13 +21,15 @@ namespace PeakSWC.RemotePhotinoNET
     {
         private RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient? client = null;
         private readonly Uri uri;
-        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationTokenSource cts = new ();
         private readonly string windowTitle;
         private readonly string hostHtmlPath;
         private readonly string hostname;
-        private readonly object bootLock = new object();
+        private readonly object bootLock = new ();
 
         private Func<string, Stream?> FrameworkFileResolver { get; } = SupplyFrameworkFile;
+      
+        private Point _lastLocation;
 
         public Guid Id { get; set; }
 
@@ -154,7 +156,15 @@ namespace PeakSWC.RemotePhotinoNET
        
         public IPhotinoWindow Parent => throw new NotImplementedException();
 
-        public List<IPhotinoWindow> Children { get; } = new();
+        public bool Resizable => throw new NotImplementedException();
+
+        public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors => throw new NotImplementedException();
+
+        public PhotinoNET.Structs.Monitor MainMonitor => throw new NotImplementedException();
+
+        public List<IPhotinoWindow> Children  => throw new NotImplementedException();
+
+        public uint ScreenDpi => throw new NotImplementedException();
 
         public IJSRuntime JSRuntime { get; set; }
 
@@ -169,39 +179,11 @@ namespace PeakSWC.RemotePhotinoNET
             }
         }
 
-
-        #region TODO
-
-        //private readonly IntPtr _nativeInstance;
-        //private readonly int _managedThreadId;
-        //private readonly List<GCHandle> _gcHandlesToFree = new List<GCHandle>();
-        //private readonly List<IntPtr> _hGlobalToFree = new List<IntPtr>();
-
-        // Internal State
         private Size _lastSize;
-        private Point _lastLocation;
-
-        private bool _resizable = true;
-        public bool Resizable
-        {
-            get => _resizable;
-            set
-            {
-                if (_resizable != value)
-                {
-                    _resizable = value;
-                    //Invoke(() => Photino_SetResizable(_nativeInstance, _resizable ? 1 : 0));
-                }
-            }
-        }
-
         public Size Size
         {
-            get
-            {
-                //Photino_GetSize(_nativeInstance, out _width, out _height);
-                return new Size(_width, _height);
-            }
+            get => JSRuntime.InvokeAsync<Size>("RemotePhotinio.size").Result;
+               
             set
             {
                 // ToDo:
@@ -210,8 +192,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     _width = value.Width;
                     _height = value.Height;
-
-                    //Invoke(() => Photino_SetSize(_nativeInstance, _width, _height));
+                    JSRuntime.InvokeVoidAsync("RemotePhotino.setSize", new object[] { new Size(_width,_height) });
                 }
             }
         }
@@ -247,13 +228,17 @@ namespace PeakSWC.RemotePhotinoNET
                 }
             }
         }
+        
+        //public Point Location { get { var l = JSRuntime.InvokeAsync<Point>("RemoteWebWindow.location").Result; return new Point(l.X, l.Y); } set => JSRuntime.InvokeVoidAsync("RemoteWebWindow.setLocation", new object[] { value }); }
 
         public Point Location
         {
             get
             {
-                //Photino_GetPosition(_nativeInstance, out _left, out _top);
-                return new Point(_left, _top);
+                var p = JSRuntime.InvokeAsync<Point>("RemotePhotino.location").Result;
+                _left = p.X;
+                _top = p.Y;
+                return p;
             }
             set
             {
@@ -261,8 +246,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     _left = value.X;
                     _top = value.Y;
-
-                    //Invoke(() => Photino_SetPosition(_nativeInstance, _left, _top));
+                    JSRuntime.InvokeVoidAsync("RemotePhotino.setLocation", new object[] { new Point(value.X, value.Y) });
                 }
             }
         }
@@ -299,6 +283,8 @@ namespace PeakSWC.RemotePhotinoNET
             }
         }
 
+        public bool IsOnTop { get => false; set { throw new NotImplementedException(); } }
+
         private int _logVerbosity;
         ///<summary>0 = Critical Only, 1 = Critical and Warning, 2 = Verbose, >2 = All Details</summary>
         public int LogVerbosity
@@ -307,58 +293,116 @@ namespace PeakSWC.RemotePhotinoNET
             set { _logVerbosity = value; }
         }
 
-        public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors
+        /// <summary>
+        /// Shows the current IPhotinoWindow instance window.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Show()
         {
-            get
-            {
-                List<PhotinoNET.Structs.Monitor> monitors = new List<PhotinoNET.Structs.Monitor>();
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Show()");
 
-                //int callback(in NativeMonitor monitor)
-                //{
-                //    monitors.Add(new Structs.Monitor(monitor));
-                //    return 1;
-                //}
+            Client.Show(new IdMessageRequest { Id = Id.ToString() });
 
-                //Photino_GetAllMonitors(_nativeInstance, callback);
-                
-                return monitors;
-            }
-        }
-        public PhotinoNET.Structs.Monitor MainMonitor => this.Monitors.First();
+            // Is used to indicate that the window was
+            // shown to the user at least once. Some
+            // functionality like registering custom
+            // scheme handlers can only be executed on
+            // the native window before it was shown the
+            // first time.
+            _wasShown = true;
 
-        // Bug:
-        // ScreenDpi is static in macOS's Photino.Native, at 72 dpi.
-        public uint ScreenDpi => 0;// Photino_GetScreenDpi(_nativeInstance);
-
-        private bool _onTop = false;
-        public bool IsOnTop
-        {
-            get => _onTop;
-            set
-            {
-                if (_onTop != value)
-                {
-                    _onTop = value;
-                    //Invoke(() => Photino_SetTopmost(_nativeInstance, _onTop ? 1 : 0));
-                }
-            }
+            return this;
         }
 
         private bool _wasShown = false;
         public bool WasShown => _wasShown;
+
+        /// <summary>
+        /// Sets whether the user can resize the current window or not.
+        /// </summary>
+        /// <param name="isResizable">Let user resize window</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow UserCanResize(bool isResizable = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Adds a child IPhotinoWindow instance to the current instance.
+        /// </summary>
+        /// <param name="child">The IPhotinoWindow child instance to be added</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow AddChild(IPhotinoWindow child)
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Removes a child IPhotinoWindow instance from the current instance.
+        /// </summary>
+        /// <param name="child">The IPhotinoWindow child instance to be removed</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow RemoveChild(IPhotinoWindow child, bool childIsDisposing = false)
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Removes a child IPhotinoWindow instance identified by its Id from the current instance.
+        /// </summary>
+        /// <param name="id">The Id of the IPhotinoWindow child instance to be removed</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow RemoveChild(Guid id, bool childIsDisposing = false)
+        {
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Set the window icon file
+        /// </summary>
+        /// <param name="path">The path to the icon file</param>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow SetIconFile(string path)
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".SetIconFile(string path)");
+
+            // ToDo:
+            // Determine if Path.GetFullPath is always safe to use.
+            // Perhaps it needs to be constrained to the application
+            // root folder?
+
+
+            return this;
+        }
+
+        /// <summary>
+        /// Hides the current IPhotinoWindow instance window.
+        /// </summary>
+        /// <returns>The current IPhotinoWindow instance</returns>
+        public IPhotinoWindow Hide()
+        {
+            if (this.LogVerbosity > 1)
+                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Hide()");
+
+            throw new NotImplementedException("Hide is not yet implemented in PhotinoNET.");
+        }
+
+
+        #region TODO
+
+
+
 
         // Static API Members
         public static bool IsWindowsPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         public static bool IsMacOsPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         public static bool IsLinuxPlatform => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
-        
+        bool IPhotinoWindow.Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        IReadOnlyList<PhotinoNET.Structs.Monitor> IPhotinoWindow.Monitors => throw new NotImplementedException();
 
-        PhotinoNET.Structs.Monitor IPhotinoWindow.MainMonitor => throw new NotImplementedException();
 
-        
+
+
 
         //public event EventHandler<string> ;
 
@@ -390,7 +434,7 @@ namespace PeakSWC.RemotePhotinoNET
             bool fullscreen = false)
         {
             this.uri = uri;
-            this.Id = id == default(Guid) ? Guid.NewGuid() : id;
+            this.Id = id == default ? Guid.NewGuid() : id;
             this.hostHtmlPath = hostHtmlPath;
             this.hostname = Dns.GetHostName();
 
@@ -510,113 +554,16 @@ namespace PeakSWC.RemotePhotinoNET
             //_hGlobalToFree.Clear();
         }
 
-        /// <summary>
-        /// Adds a child IPhotinoWindow instance to the current instance.
-        /// </summary>
-        /// <param name="child">The IPhotinoWindow child instance to be added</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow AddChild(IPhotinoWindow child)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".AddChild(IPhotinoWindow child)");
+        
 
-            this.Children.Add(child);
+       
 
-            return this;
-        }
+       
 
-        /// <summary>
-        /// Removes a child IPhotinoWindow instance from the current instance.
-        /// </summary>
-        /// <param name="child">The IPhotinoWindow child instance to be removed</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow RemoveChild(IPhotinoWindow child, bool childIsDisposing = false)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RemoveChild(IPhotinoWindow child)");
+       
+        
 
-            this.Children.Remove(child);
-            
-            // Don't execute the Dispose method on a child
-            // when it is already being disposed (this method
-            // may be called from Dispose on child).
-            if (childIsDisposing == false)
-            {
-                child.Dispose();
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Removes a child IPhotinoWindow instance identified by its Id from the current instance.
-        /// </summary>
-        /// <param name="id">The Id of the IPhotinoWindow child instance to be removed</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow RemoveChild(Guid id, bool childIsDisposing = false)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".RemoveChild(Guid id)");
-
-            IPhotinoWindow child = this.Children
-                .FirstOrDefault(c => c.Id == id);
-
-            return this.RemoveChild(child, childIsDisposing);
-        }
-
-        /// <summary>
-        /// Set the window icon file
-        /// </summary>
-        /// <param name="path">The path to the icon file</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow SetIconFile(string path)
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".SetIconFile(string path)");
-
-            // ToDo:
-            // Determine if Path.GetFullPath is always safe to use.
-            // Perhaps it needs to be constrained to the application
-            // root folder?
-            //Invoke(() => Photino_SetIconFile(_nativeInstance, Path.GetFullPath(path)));
-
-            return this;
-        }
-
-        /// <summary>
-        /// Shows the current IPhotinoWindow instance window.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Show()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Show()");
-
-            //Invoke(() => Photino_Show(_nativeInstance));
-
-            // Is used to indicate that the window was
-            // shown to the user at least once. Some
-            // functionality like registering custom
-            // scheme handlers can only be executed on
-            // the native window before it was shown the
-            // first time.
-            _wasShown = true;
-
-            return this;
-        }
-
-        /// <summary>
-        /// Hides the current IPhotinoWindow instance window.
-        /// </summary>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow Hide()
-        {
-            if (this.LogVerbosity > 1)
-                Console.WriteLine($"Executing: \"{this.Title ?? "PhotinoWindow"}\".Hide()");
-            
-            throw new NotImplementedException("Hide is not yet implemented in PhotinoNET.");
-        }
-
+       
         /// <summary>
         /// Closes the current IPhotinoWindow instance. Also closes
         /// all children of the current IPhotinoWindow instance.
@@ -641,17 +588,7 @@ namespace PeakSWC.RemotePhotinoNET
             //Invoke(() => Photino_WaitForExit(_nativeInstance));
         }
 
-        /// <summary>
-        /// Sets whether the user can resize the current window or not.
-        /// </summary>
-        /// <param name="isResizable">Let user resize window</param>
-        /// <returns>The current IPhotinoWindow instance</returns>
-        public IPhotinoWindow UserCanResize(bool isResizable = true)
-        {
-            this.Resizable = isResizable;
-
-            return this;
-        }
+       
 
         /// <summary>
         /// Resizes the current window instance using a Size struct.
@@ -725,9 +662,11 @@ namespace PeakSWC.RemotePhotinoNET
                     }
 
                     // Calculate window size based on main monitor work area
-                    size = new Size();
-                    size.Width = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Width / 100 * width), 0);
-                    size.Height = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Height / 100 * height), 0);
+                    size = new Size
+                    {
+                        Width = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Width / 100 * width), 0),
+                        Height = (int)Math.Round((decimal)(this.MainMonitor.WorkArea.Height / 100 * height), 0)
+                    };
 
                     break;
                 default:
@@ -843,7 +782,7 @@ namespace PeakSWC.RemotePhotinoNET
                 bool isOutsideHorizontalWorkArea = horizontalWindowEdge > horizontalWorkAreaEdge;
                 bool isOutsideVerticalWorkArea = verticalWindowEdge > verticalWorkAreaEdge;
 
-                Point locationInsideWorkArea = new Point(
+                Point locationInsideWorkArea = new(
                     isOutsideHorizontalWorkArea ? horizontalWorkAreaEdge - this.Width : location.X,
                     isOutsideVerticalWorkArea ? verticalWorkAreaEdge - this.Height : location.Y
                 );

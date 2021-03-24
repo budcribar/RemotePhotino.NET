@@ -13,12 +13,12 @@ namespace UnitTests
     public class UnitTest1
     {
         private static Process process;
-        private static List<Process> clients;
+        private readonly static List<Process> clients;
 
         [TestMethod]
         public void TestMethod1()
         {
-            RemotePhotinoWindow rpw = new RemotePhotinoWindow(new Uri(@"https://localhost:443"),"index.html", "Title");
+            RemotePhotinoWindow rpw = new(new Uri(@"https://localhost:443"),"index.html", "Title");
             rpw.WindowCreating += Rpw_WindowCreating;
 
             Assert.IsNotNull(rpw);
@@ -40,7 +40,7 @@ namespace UnitTests
         public static void StartServer()
         {
             const string ServiceName = "RemotePhotinoService";
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new ();
             sw.Start();
 
             Process.GetProcesses().FirstOrDefault(p => p.ProcessName == ServiceName)?.Kill();
