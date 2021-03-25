@@ -37,8 +37,56 @@ namespace PeakSWC.RemotePhotinoNET
         public event EventHandler WindowCreating;
         public event EventHandler WindowCreated;
         public event EventHandler WindowClosing;
-        public event EventHandler<Size> SizeChanged;
-        public event EventHandler<Point> LocationChanged;
+
+        private event EventHandler<Size> SizeChangedEvent;
+        public event EventHandler<Size> SizeChanged
+        {
+            add
+            {
+                lock (eventLock)
+                {
+                    JSRuntime.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { true });
+                    SizeChangedEvent += value;
+                }
+
+            }
+            remove
+            {
+                lock (eventLock)
+                {
+                    SizeChangedEvent -= value;
+
+                    if (LocationChangedEvent.GetInvocationList().Length == 0)
+                        JSRuntime.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { false });
+                }
+            }
+        }
+
+        private readonly object eventLock = new object();
+
+        private event EventHandler<Point> LocationChangedEvent;
+        public event EventHandler<Point> LocationChanged
+        {
+            add
+            {
+                lock (eventLock)
+                {
+                    JSRuntime.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { true });
+                    LocationChangedEvent += value;
+                }
+
+            }
+            remove
+            {
+                lock (eventLock)
+                {
+                    LocationChanged -= value;
+
+                    if (LocationChangedEvent.GetInvocationList().Length == 0)
+                        JSRuntime.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { false });
+                }
+            }
+        }
         public event EventHandler<string> WebMessageReceived;
 
         public static Stream? SupplyFrameworkFile(string uri)
@@ -678,6 +726,7 @@ namespace PeakSWC.RemotePhotinoNET
         /// <param name="left">The position from the left side of the screen</param>
         /// <param name="top">The position from the top side of the screen</param>
         /// <param name="fullscreen">Open window in fullscreen mode</param>
+        
         public RemotePhotinoWindow(
             Uri uri,
             string hostHtmlPath,
@@ -785,12 +834,12 @@ namespace PeakSWC.RemotePhotinoNET
             // Prevent disposal of child by marking the child
             // window as being in the process of being disposed.
             // This prevents the recursive execution of Dispose().
-            this.Parent?.RemoveChild(this, true);
+            //this.Parent?.RemoveChild(this, true);
 
             // Make sure all children of a window get closed.
-            this.Children
-                .ToList()
-                .ForEach(child => { child.Close(); });
+            //this.Children
+            //    .ToList()
+            //    .ForEach(child => { child.Close(); });
 
             //Invoke(() => Photino_SetResizedCallback(_nativeInstance, null));
             //Invoke(() => Photino_SetMovedCallback(_nativeInstance, null));
@@ -1210,7 +1259,7 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnSizeChanged(int width, int height)");
 
-            this.SizeChanged?.Invoke(this, new Size(width, height));
+            this.SizeChangedEvent?.Invoke(this, new Size(width, height));
         }
 
         private void OnLocationChanged(int left, int top)
@@ -1218,7 +1267,7 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnLocationChanged(int left, int top)");
 
-            this.LocationChanged?.Invoke(this, new Point(left, top));
+            this.LocationChangedEvent?.Invoke(this, new Point(left, top));
         }
 
         private void OnWebMessageReceived(string message)
