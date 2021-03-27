@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -64,6 +65,25 @@ namespace PeakSWC.RemotePhotinoNET
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<RemotePhotinoService>();
+                endpoints.MapGrpcService<BrowserIPCService>().EnableGrpcWeb();
+
+                endpoints.MapGet("/app", async context =>
+                {
+                    if (context.Request.Query.TryGetValue("guid", out StringValues value))
+                    {
+                        string guid = value.ToString();
+
+                        if (rootDictionary.ContainsKey(guid))
+                        {
+                            var home = rootDictionary[guid].HtmlHostPath;
+
+                            context.Response.Redirect(guid + "/" + home);
+                        }
+                        else await context.Response.WriteAsync("Invalid Guid");
+                    }
+                    else await context.Response.WriteAsync("Invalid Guid");
+                });
+
 
                 endpoints.MapGet("/", async context =>
                 {

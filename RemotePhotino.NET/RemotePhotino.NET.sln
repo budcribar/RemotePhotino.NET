@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\..\pho
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloRemotePhotino.Blazor", "..\HelloRemotePhotino.Blazor\HelloRemotePhotino.Blazor.csproj", "{DCD51D90-8CA9-4031-8D7D-0221C11DE253}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor.JS", "..\..\photino.Blazor\Photino.Blazor.JS\Photino.Blazor.JS.csproj", "{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

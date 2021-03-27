@@ -348,3 +348,7 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/RemotePhotino.Blazor.JS/src/generated/webwindow_pb_service.js
+/RemotePhotino.Blazor.JS/src/generated/webwindow_pb_service.d.ts
+/RemotePhotino.Blazor.JS/src/generated/webwindow_pb.js
+/RemotePhotino.Blazor.JS/src/generated/webwindow_pb.d.ts
