@@ -5,12 +5,12 @@ import { internalFunctions as navigationManagerFunctions } from '@browserjs/Serv
 import { decode } from 'base64-arraybuffer';
 import * as ipc from './IPC';
 import { RenderQueue } from './RenderQueue';
-import { initializeRemoteWebWindow } from './RemoteWebWindow';
+import { initializeRemotePhotino } from './RemoteWebWindow';
 
 
 function boot() {
 
-    initializeRemoteWebWindow();
+    initializeRemotePhotino();
 
     setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('BlazorWebView', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
     navigationManagerFunctions.listenForNavigationEvents((uri: string, intercepted: boolean) => {

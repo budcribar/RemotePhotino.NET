@@ -19,7 +19,7 @@ export async function sendMessage(message: string) {
     });
 }
 
-export function initializeRemoteWebWindow() {
+export function initializeRemotePhotino() {
     var message = new IdMessageRequest();
     var id = window.location.pathname.split('/')[1];
     message.setId(id);
@@ -41,7 +41,84 @@ export function initializeRemoteWebWindow() {
             }
         });
 
-    (<any>window).RemoteWebWindow = {
+    window.addEventListener('resize', (event) => {
+        if ((<any>window).RemotePhotino.resizeEventHandlerAttached)
+            sendMessage("size:" + JSON.stringify((<any>window).RemotePhotino.size()));
+    });
+
+    var prevX = window.screenX;
+    var prevY = window.screenY;
+
+    var interval = setInterval(function () {
+        if (prevX != window.screenX || prevY != window.screenY) {
+            if ((<any>window).RemotePhotino.locationEventHandlerAttached)
+                sendMessage("location:" + JSON.stringify((<any>window).RemotePhotino.location()));
+        }
+        prevX = window.screenX;
+        prevY = window.screenY;
+    }, 200);
+
+
+    (<any>window).RemotePhotino = {
+        resizeEventHandlerAttached: true,
+        setResizeEventHandlerAttached: function (value) {
+            (<any>window).RemotePhotino.resizeEventHandlerAttached = value;
+        },
+
+        locationEventHandlerAttached: true,
+        setLocationEventHandlerAttached: function (value) {
+            (<any>window).RemotePhotino.locationEventHandlerAttached = value;
+        },
+
+        width: function () {
+
+            return window.outerWidth;
+        },
+        setWidth: function (width) {
+            window.resizeTo(width, window.outerHeight);
+        },
+        height: function () {
+            return window.outerHeight;
+        },
+        setHeight: function (height) {
+            window.resizeTo(window.outerWidth, height);
+        },
+
+        left: function () {
+            return window.screenLeft;
+        },
+        setLeft: function (left) {
+            window.moveTo(left, window.screenY)
+        },
+        location: function () {
+            return { X: window.screenX, Y: window.screenY }
+        },
+        setLocation: function (location) {
+            window.moveTo(location.x, location.y)
+        },
+        top: function () {
+            return window.screenTop;
+        },
+        setTop: function (top) {
+            window.moveTo(window.screenX, top);
+        },
+        size: function () {
+            return { Width: window.outerWidth, Height: window.outerHeight }
+        },
+
+        title: function () {
+            return window.document.title
+        },
+
+        setTitle: function (title) {
+            return window.document.title = title;
+        },
+        setSize: function (size) {
+            return window.resizeTo(size.width, size.height);
+        },
+
+
+
 
         showMessage: function (title,body) {
 
