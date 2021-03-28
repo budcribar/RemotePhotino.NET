@@ -18,9 +18,11 @@ namespace PeakSWC.RemotePhotinoNET
         private readonly ConcurrentDictionary<string, byte[]> _fileCache = new();
         private readonly ILogger<RemotePhotinoService> _logger;
 
-        public RemotePhotinoService(ILogger<RemotePhotinoService> logger)
+        public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc)
         {
             _logger = logger;
+            _webWindowDictionary = rootDictionary;
+            _ipc = ipc;
         }
         private void ExShutdown(string id)
         {
@@ -73,6 +75,11 @@ namespace PeakSWC.RemotePhotinoNET
         public override Task<Empty> NavigateToUrl(UrlMessageRequest request, ServerCallContext context)
         {
             return base.NavigateToUrl(request, context);
+        }
+
+        public override Task<Empty> Show(IdMessageRequest request, ServerCallContext context)
+        {
+            return Task.FromResult<Empty>(new Empty());
         }
 
     }

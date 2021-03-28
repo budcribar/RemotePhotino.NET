@@ -176,3 +176,14 @@ service BrowserIPC {
     rpc GetHeight(IdMessageRequest) returns (IntMessageResponse);
 
 }
+
+message ClientResponse {
+    string id = 1;
+    string hostName = 2;
+    string url = 3;
+    bool addClient = 4;
+}
+
+service ClientIPC {
+    rpc GetClients(google.protobuf.Empty) returns (stream ClientResponse);
+}

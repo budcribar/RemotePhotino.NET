@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <WebpackInputs Remove="Boot.Desktop.ts" />
     <WebpackInputs Remove="src\RemoteWebWindow.ts" />
     <WebpackInputs Remove="src\RenderQueue.ts" />
   </ItemGroup>

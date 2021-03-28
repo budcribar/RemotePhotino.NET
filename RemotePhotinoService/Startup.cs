@@ -65,7 +65,7 @@ namespace PeakSWC.RemotePhotinoNET
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<RemotePhotinoService>();
-                endpoints.MapGrpcService<BrowserIPCService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<ClientIPCService>().EnableGrpcWeb();
 
                 endpoints.MapGet("/app", async context =>
                 {
