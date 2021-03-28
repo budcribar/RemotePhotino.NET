@@ -1225,7 +1225,7 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowCreating()");
 
-            this.WindowCreating?.Invoke(this, null);
+            this.WindowCreating?.Invoke(this, EventArgs.Empty);
         }
         
         private void OnWindowCreated()
@@ -1233,7 +1233,7 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowCreated()");
 
-            this.WindowCreated?.Invoke(this, null);
+            this.WindowCreated?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnWindowClosing()
@@ -1241,7 +1241,7 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnWindowClosing()");
 
-            this.WindowClosing?.Invoke(this, null);
+            this.WindowClosing?.Invoke(this, EventArgs.Empty);
         }
 
         // Invoke native event handlers

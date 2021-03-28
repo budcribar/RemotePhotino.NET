@@ -12,7 +12,7 @@ namespace PeakSWC.RemotePhotinoNET
     {
         private readonly ILogger<ClientIPCService> _logger;
         public ConcurrentDictionary<Guid, IPC> IPC { get; set; }
-        private volatile bool shutdown = false;
+        //private volatile bool shutdown = false;
 
         public ClientIPCService(ILogger<ClientIPCService> logger, ConcurrentDictionary<Guid, IPC> ipc)
         {

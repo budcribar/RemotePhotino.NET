@@ -21,8 +21,8 @@ namespace PeakSWC.RemotePhotinoNET
         public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc)
         {
             _logger = logger;
-            _webWindowDictionary = rootDictionary;
-            _ipc = ipc;
+            this._webWindowDictionary = rootDictionary;
+            this._ipc = ipc;
         }
         private void ExShutdown(string id)
         {
