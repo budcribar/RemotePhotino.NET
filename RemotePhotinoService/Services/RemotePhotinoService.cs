@@ -51,7 +51,7 @@ namespace PeakSWC.RemotePhotinoNET
                     HtmlHostPath = request.HtmlHostPath,
                     Hostname = request.Hostname,
                 };
-                await _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = true, Id = request.Id, HostName = request.Hostname, Url= $"https:://127.0.0.1/app?guid={request.Id}" });
+                await _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = true, Id = request.Id, HostName = request.Hostname, Url= $"https://localhost/app?guid={request.Id}" });
 
                 if (!_ipc.ContainsKey(request.Id)) _ipc.TryAdd(request.Id, new IPC());
                 _ipc[request.Id].ResponseStream = responseStream;
