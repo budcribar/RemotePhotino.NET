@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -9,7 +9,16 @@
   <ItemGroup>
     <!--
     <PackageReference Include="Grpc.AspNetCore" Version="2.36.0" />
+   
     -->
+    <PackageReference Include="Grpc.Net.Client.Web" Version="2.36.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.36.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.36.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Google.Protobuf" Version="3.15.6" />
+    
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.4" />
 	  <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="5.0.4" />
 	  
@@ -20,11 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--
+    
     <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Client">
       <Link>Protos\remotephotino.proto</Link>
     </Protobuf>
-   -->
+   
    
   </ItemGroup>
 
