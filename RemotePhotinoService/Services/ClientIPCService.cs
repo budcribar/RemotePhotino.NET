@@ -5,24 +5,30 @@ using System.Threading;
 using System;
 using System.Collections.Concurrent;
 using Google.Protobuf.WellKnownTypes;
+using System.Threading.Channels;
 
 namespace PeakSWC.RemotePhotinoNET
 {
-    public class ClientIPCService
+    public class ClientIPCService : ClientIPC.ClientIPCBase
     {
         private readonly ILogger<ClientIPCService> _logger;
-        public ConcurrentDictionary<Guid, IPC> IPC { get; set; }
-        //private volatile bool shutdown = false;
+        private Channel<ClientResponse> _serviceStateChannel;
 
-        public ClientIPCService(ILogger<ClientIPCService> logger, ConcurrentDictionary<Guid, IPC> ipc)
+        public ClientIPCService(ILogger<ClientIPCService> logger, Channel<ClientResponse> serviceStateChannel)
         {
             _logger = logger;
-            
-            IPC = ipc;
+
+            _serviceStateChannel = serviceStateChannel;
         }
 
-     
-       
+        public override async Task GetClients(Empty request, IServerStreamWriter<ClientResponse> responseStream, ServerCallContext context)
+        {
+            await foreach (var state in _serviceStateChannel.Reader.ReadAllAsync())
+            {
+                await responseStream.WriteAsync(state);
+            }
+        }
+
 
     }
 }

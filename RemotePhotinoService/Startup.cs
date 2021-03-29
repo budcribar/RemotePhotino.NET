@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace PeakSWC.RemotePhotinoNET
@@ -16,6 +17,7 @@ namespace PeakSWC.RemotePhotinoNET
     {
         private readonly ConcurrentDictionary<string, ServiceState> rootDictionary = new();
         private readonly ConcurrentDictionary<string, IPC> ipcDictionary = new();
+        private readonly Channel<ClientResponse> serviceStateChannel = Channel.CreateUnbounded<ClientResponse>();
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -23,6 +25,7 @@ namespace PeakSWC.RemotePhotinoNET
         {
             services.AddSingleton(ipcDictionary);
             services.AddSingleton(rootDictionary);
+            services.AddSingleton(serviceStateChannel);
 
             services.AddGrpc();
 
@@ -38,7 +41,7 @@ namespace PeakSWC.RemotePhotinoNET
                     //builder.WithOrigins("localhost:443", "localhost", "YourCustomDomain");
                     // builder.WithMethods("POST, OPTIONS");
                     //builder.AllowAnyHeader();
-                    builder.WithExposedHeaders("Grpc-Status", "Grpc-Message");
+                    builder.WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
                 });
             });
         }
@@ -51,9 +54,9 @@ namespace PeakSWC.RemotePhotinoNET
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
+            app.UseCors("CorsPolicy");
 
-            app.UseCors("CorPolicy");
+            app.UseRouting();
 
             app.UseGrpcWeb();
 
@@ -65,7 +68,8 @@ namespace PeakSWC.RemotePhotinoNET
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<RemotePhotinoService>();
-                endpoints.MapGrpcService<ClientIPCService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<ClientIPCService>().EnableGrpcWeb();//.RequireCors("CorPolicy")
+                endpoints.MapGrpcService<BrowserIPCService>().EnableGrpcWeb();
 
                 endpoints.MapGet("/app", async context =>
                 {

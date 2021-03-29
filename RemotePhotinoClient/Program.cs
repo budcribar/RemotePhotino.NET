@@ -25,8 +25,8 @@ namespace RemotePhotinoClient
             {
                 // Get the service address from appsettings.json
                 var config = services.GetRequiredService<IConfiguration>();
-                var backendUrl = "https://localhost:5001";
-
+                //var backendUrl = "https://127.0.0.1:443";
+                var backendUrl = "https://localhost:443";
                 // Create a channel with a GrpcWebHandler that is addressed to the backend server.
                 //
                 // GrpcWebText is used because server streaming requires it. If server streaming is not used in your app

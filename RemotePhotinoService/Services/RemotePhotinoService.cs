@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace PeakSWC.RemotePhotinoNET
@@ -17,22 +18,27 @@ namespace PeakSWC.RemotePhotinoNET
         private readonly ConcurrentDictionary<string, IPC> _ipc;
         private readonly ConcurrentDictionary<string, byte[]> _fileCache = new();
         private readonly ILogger<RemotePhotinoService> _logger;
+        private readonly Channel<ClientResponse> _serviceStateChannel;
 
-        public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc)
+        public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc, Channel<ClientResponse> serviceStateChannel)
         {
             _logger = logger;
             this._webWindowDictionary = rootDictionary;
             this._ipc = ipc;
+            _serviceStateChannel = serviceStateChannel;
         }
         private void ExShutdown(string id)
         {
             _logger.LogInformation("Shutting down..." + id);
 
+            ServiceState? ss = new();
             if (_webWindowDictionary.ContainsKey(id))
-                _webWindowDictionary.Remove(id, out var _);
+                _webWindowDictionary.Remove(id, out ss);
 
             if (_ipc.ContainsKey(id))
                 _ipc.Remove(id, out var _);
+
+            _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = false, Id=id });
         }
 
         public override async Task CreateWebWindow(CreateWebWindowRequest request, IServerStreamWriter<WebMessageResponse> responseStream, ServerCallContext context)
@@ -45,6 +51,7 @@ namespace PeakSWC.RemotePhotinoNET
                     HtmlHostPath = request.HtmlHostPath,
                     Hostname = request.Hostname,
                 };
+                await _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = true, Id = request.Id, HostName = request.Hostname, Url= $"https:://127.0.0.1/app?guid={request.Id}" });
 
                 if (!_ipc.ContainsKey(request.Id)) _ipc.TryAdd(request.Id, new IPC());
                 _ipc[request.Id].ResponseStream = responseStream;

@@ -1,20 +1,43 @@
 ﻿@page "/"
 @inject GrpcChannel Channel
 @using Google.Protobuf.WellKnownTypes
+@using PeakSWC.RemotePhotinoNET
+<!--
+TODO rename this to Protos
+--> 
+@using Grpc.Core;
 
-@code {
+<h3>Active Clients</h3>
 
-    
-   @* private IList<Protos.ClientResponse> beachConditions;
-
-    protected override async Task OnInitializedAsync()
+<ul>
+    @foreach (var client in activeClients)
     {
-        var client = new Protos.BeachConditions.BeachConditionsClient(Channel);
+        <li> <a href="@client.Url">@client.HostName</a></li>
+    }
+</ul>
+@code {
+    private IList<ClientResponse> activeClients = new List<ClientResponse>();
 
-        var getAllBeachConditionsRequest = new Protos.GetAllBeachConditionRequest();
+    protected override void OnInitialized()
+    {
+        var client = new ClientIPC.ClientIPCClient(Channel);
 
-        Protos.GetAllBeachConditionResponse response = await client.getAllBeachConditionsAsync(getAllBeachConditionsRequest);
+        var response =  client.GetClients(new());
+        var stream = response.ResponseStream;
 
-        beachConditions = response.BeachConditions;
-    }*@
+        var t = Task.Run(async () =>
+        {
+            await foreach (var clientResponse in response.ResponseStream.ReadAllAsync())
+            {
+                if (clientResponse.AddClient)
+                    activeClients.Add(clientResponse);
+                else
+                    activeClients.Remove(activeClients.First(x => x.Id == clientResponse.Id));
+
+                await InvokeAsync(StateHasChanged);
+              
+            }
+        });
+       
+    }
 }
