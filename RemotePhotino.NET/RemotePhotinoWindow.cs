@@ -15,6 +15,8 @@ using System.Reflection;
 using System.Net;
 using Microsoft.JSInterop;
 using Photino.Blazor;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PeakSWC.RemotePhotinoNET
 {
@@ -145,7 +147,36 @@ namespace PeakSWC.RemotePhotinoNET
                                         }
                                         else if (data == "connected:")
                                             WindowCreated?.Invoke(this,new());
+                                        else if (data.StartsWith("size:"))
+                                        {
+                                            var size = data.Replace("size:", "");
+                                            var jo = JsonConvert.DeserializeObject<JObject>(size);
 
+                                            await Task.Run(() =>
+                                            {
+                                                // Hangs otherwise
+                                                SizeChangedEvent?.Invoke(null, new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0));
+                                            });
+
+
+                                        }
+                                        else if (data.StartsWith("location:"))
+                                        {
+                                            var location = data.Replace("location:", "");
+
+
+
+                                            var jo = JsonConvert.DeserializeObject<JObject>(location);
+                                            //var x = JsonConvert.DeserializeObject<Point>(location);
+
+                                            await Task.Run(() =>
+                                            {
+                                                // TODO Hangs otherwise
+                                                LocationChangedEvent?.Invoke(null, new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0));
+                                            });
+
+
+                                        }
                                         else
                                             OnWebMessageReceived(data);
                                         break;

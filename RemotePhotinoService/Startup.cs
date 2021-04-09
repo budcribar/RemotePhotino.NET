@@ -87,12 +87,43 @@ namespace PeakSWC.RemotePhotinoNET
                     }
                     else await context.Response.WriteAsync("Invalid Guid");
                 });
-                // TODO Restart
 
-                endpoints.MapGet("/", async context =>
+                endpoints.MapGet("/wait/{id:guid}", async context =>
                 {
-                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                    var id = context.Request.RouteValues["id"];
+                    var sid = id?.ToString() ?? "";
+
+                    for (int i = 0; i < 30; i++)
+                    {
+                        if (rootDictionary.ContainsKey(sid))
+                            break;
+                        await Task.Delay(1000);
+                    }
+                    if (rootDictionary.ContainsKey(sid))
+                        await context.Response.WriteAsync($"Wait completed");
+                    else
+                        await context.Response.WriteAsync($"Unable to restart -> Timed out");
+
                 });
+
+                endpoints.MapGet("/{id:guid}", async context =>
+                {
+                    // restart url
+                    var id = context.Request.RouteValues["id"];
+                    var sid = id.ToString();
+                    if (sid == null) return;
+
+                    ipcDictionary[sid].ReceiveMessage("booted:");
+
+                    context.Response.Redirect($"/restart?guid={sid}");
+                    await Task.CompletedTask;
+                });
+
+
+                //endpoints.MapGet("/", async context =>
+                //{
+                //    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                //});
             });
         }
     }

@@ -12,9 +12,9 @@ function boot() {
 
     initializeRemotePhotino();
 
-    setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('BlazorWebView', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
+    setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('Photino.Blazor', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
     navigationManagerFunctions.listenForNavigationEvents((uri: string, intercepted: boolean) => {
-        return DotNet.invokeMethodAsync('BlazorWebView', 'NotifyLocationChanged', uri, intercepted);
+        return DotNet.invokeMethodAsync('Photino.Blazor', 'NotifyLocationChanged', uri, intercepted);
     });
     const renderQueue = RenderQueue.getOrCreate();
 
