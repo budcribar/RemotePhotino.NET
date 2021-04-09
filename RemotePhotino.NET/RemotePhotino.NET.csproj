@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Authors>BudCribar</Authors>
@@ -20,18 +20,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.15.6" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.8" />
     <PackageReference Include="Grpc.Net.Client" Version="2.36.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.36.1">
+    <PackageReference Include="Grpc.Tools" Version="2.37.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.JSInterop" Version="5.0.3" />
+    <PackageReference Include="Microsoft.JSInterop" Version="5.0.5" />
 	
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\RemotePhotino.Blazor.JS\dist\remote.blazor.desktop.js" Link="remote.blazor.desktop.js" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Client" Link="Protos\remotephotino.proto" />
+	  <ProjectReference Include="..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj" />
     <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 

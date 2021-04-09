@@ -13,7 +13,7 @@ namespace UnitTests
     public class UnitTest1
     {
         private static Process process;
-        private readonly static List<Process> clients;
+        //private readonly static List<Process> clients;
 
         [TestMethod]
         public void TestMethod1()
@@ -29,7 +29,7 @@ namespace UnitTests
 
         private void Rpw_WindowCreating(object sender, System.EventArgs e)
         {
-            int x = 3;
+            //int x = 3;
         }
 
         [TestInitialize]

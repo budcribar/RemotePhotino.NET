@@ -1,7 +1,7 @@
 import { receiveMessage } from './IPC';
 import { grpc } from "@improbable-eng/grpc-web";
-import { BrowserIPC } from "./generated/webwindow_pb_service";
-import { StringRequest, IdMessageRequest } from "./generated/webwindow_pb";
+import { BrowserIPC } from "./generated/remotephotino_pb_service";
+import { StringRequest, IdMessageRequest } from "./generated/remotephotino_pb";
 
 export async function sendMessage(message: string) {
     var req = new StringRequest();

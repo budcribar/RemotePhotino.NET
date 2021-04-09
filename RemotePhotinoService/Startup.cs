@@ -87,7 +87,7 @@ namespace PeakSWC.RemotePhotinoNET
                     }
                     else await context.Response.WriteAsync("Invalid Guid");
                 });
-
+                // TODO Restart
 
                 endpoints.MapGet("/", async context =>
                 {

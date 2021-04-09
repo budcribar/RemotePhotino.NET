@@ -11,10 +11,10 @@ namespace PeakSWC.RemotePhotinoNET
     public class BrowserIPCService : BrowserIPC.BrowserIPCBase
     {
         private readonly ILogger<BrowserIPCService> _logger;
-        public ConcurrentDictionary<Guid, IPC> IPC { get; set; }
+        public ConcurrentDictionary<string, IPC> IPC { get; set; }
         private volatile bool shutdown = false;
 
-        public BrowserIPCService(ILogger<BrowserIPCService> logger, ConcurrentDictionary<Guid, IPC> ipc)
+        public BrowserIPCService(ILogger<BrowserIPCService> logger, ConcurrentDictionary<string, IPC> ipc)
         {
             _logger = logger;
             
@@ -30,8 +30,8 @@ namespace PeakSWC.RemotePhotinoNET
         public override Task ReceiveMessage(IdMessageRequest request, IServerStreamWriter<StringRequest> responseStream, ServerCallContext context)
         {
             Guid id = Guid.Parse(request.Id);
-            if (!IPC.ContainsKey(id)) IPC.TryAdd(id,new IPC());
-            IPC[id].BrowserResponseStream = responseStream;
+            if (!IPC.ContainsKey(id.ToString())) IPC.TryAdd(id.ToString(),new IPC());
+            IPC[id.ToString()].BrowserResponseStream = responseStream;
 
             // TODO
 
@@ -44,8 +44,8 @@ namespace PeakSWC.RemotePhotinoNET
         public override Task<Empty> SendMessage(StringRequest request, ServerCallContext context)
         {
             Guid id = Guid.Parse(request.Id);
-            if (!IPC.ContainsKey(id)) IPC.TryAdd(id, new IPC());
-            IPC[id].ReceiveMessage(request.Request);
+            if (!IPC.ContainsKey(id.ToString())) IPC.TryAdd(id.ToString(), new IPC());
+            IPC[id.ToString()].ReceiveMessage(request.Request);
             return Task.FromResult<Empty>(new Empty());
         }
 

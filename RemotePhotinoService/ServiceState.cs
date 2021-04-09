@@ -1,10 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Channels;
 namespace System.Runtime.CompilerServices
 {
     // TODO This is a bug in compiler
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class IsExternalInit { }
 }
 namespace PeakSWC.RemotePhotinoNET

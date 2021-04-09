@@ -6,6 +6,7 @@ using PhotinoNET;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -40,7 +41,50 @@ namespace PeakSWC.RemotePhotinoNET
 
             _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = false, Id=id });
         }
+        public override async Task FileReader(IAsyncStreamReader<FileReadRequest> requestStream, IServerStreamWriter<FileReadResponse> responseStream, ServerCallContext context)
+        {
+            var id = "";
+            try
+            {
+                await foreach (var message in requestStream.ReadAllAsync())
+                {
+                    if (message.Path == "Initialize")
+                    {
+                        id = message.Id;
+                        var task = Task.Run(async () =>
+                        {
+                            while (true)
+                            {
+                                var file = await _webWindowDictionary[id].FileCollection.Reader.ReadAsync();
+                                {
+                                    
+                                    await responseStream.WriteAsync(new FileReadResponse { Id = id, Path = file });
+                                    
+                                }
+                            }
 
+                        });
+
+                    }
+                    else
+                    {
+                        var bytes = message.Data.ToArray();
+                        var resetEvent = _webWindowDictionary[message.Id].FileDictionary[message.Path].resetEvent;
+                        _webWindowDictionary[message.Id].FileDictionary[message.Path] = (new MemoryStream(bytes), resetEvent);
+                        resetEvent.Set();
+
+                        // TODO Further identify file by hash
+                        _fileCache.TryAdd(message.Path, bytes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExShutdown(id);
+
+                // Client has shut down
+            }
+        }
         public override async Task CreateWebWindow(CreateWebWindowRequest request, IServerStreamWriter<WebMessageResponse> responseStream, ServerCallContext context)
         {
            
@@ -81,7 +125,7 @@ namespace PeakSWC.RemotePhotinoNET
 
         public override Task<Empty> NavigateToUrl(UrlMessageRequest request, ServerCallContext context)
         {
-            return base.NavigateToUrl(request, context);
+            return Task.FromResult<Empty>(new Empty());
         }
 
         public override Task<Empty> Show(IdMessageRequest request, ServerCallContext context)

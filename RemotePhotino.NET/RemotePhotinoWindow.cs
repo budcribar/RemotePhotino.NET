@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Net;
 using Microsoft.JSInterop;
+using Photino.Blazor;
 
 namespace PeakSWC.RemotePhotinoNET
 {
@@ -22,7 +23,9 @@ namespace PeakSWC.RemotePhotinoNET
         private RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient? client = null;
         private readonly Uri uri;
         private readonly CancellationTokenSource cts = new ();
-        private readonly string windowTitle;
+
+        // TODO
+        //private readonly string windowTitle;
         private readonly string hostHtmlPath;
         private readonly string hostname;
         private readonly object bootLock = new ();
@@ -95,7 +98,7 @@ namespace PeakSWC.RemotePhotinoNET
             {
                 // TODO
                 if (Path.GetFileName(uri) == "remote.blazor.desktop.js")
-                    return Assembly.GetExecutingAssembly().GetManifestResourceStream("PeakSwc.RemoteableWebWindows.remote.blazor.desktop.js");
+                    return Assembly.GetExecutingAssembly().GetManifestResourceStream("PeakSWC.RemotePhotino.NET.remote.blazor.desktop.js");
 
                 if (File.Exists(uri))
                     return File.OpenRead(uri);
@@ -176,6 +179,7 @@ namespace PeakSWC.RemotePhotinoNET
                     }, cts.Token);
 
                 }
+                Thread.Sleep(300000);
                 return client;
             }
         }
@@ -213,7 +217,7 @@ namespace PeakSWC.RemotePhotinoNET
 
         public uint ScreenDpi => throw new NotImplementedException();
 
-        public IJSRuntime JSRuntime { get; set; }
+        public IJSRuntime? JSRuntime { get; set; }
 
         public string Title
         {
@@ -349,7 +353,8 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".Show()");
 
-            Client.Show(new IdMessageRequest { Id = Id.ToString() });
+            _ = Client;
+            //Client.Show(new IdMessageRequest { Id = Id.ToString() });
 
             // Is used to indicate that the window was
             // shown to the user at least once. Some
@@ -743,21 +748,7 @@ namespace PeakSWC.RemotePhotinoNET
             this.Id = id == default ? Guid.NewGuid() : id;
             this.hostHtmlPath = hostHtmlPath;
             this.hostname = Dns.GetHostName();
-
-            //_managedThreadId = Thread.CurrentThread.ManagedThreadId;
-
-            // Native Interop Events
-            //var onClosingDelegate = (ClosingDelegate)this.OnClosing;
-            //_gcHandlesToFree.Add(GCHandle.Alloc(onClosingDelegate));
-
-            //var onSizedChangedDelegate = (SizeChangedDelegate)this.OnSizeChanged;
-            //_gcHandlesToFree.Add(GCHandle.Alloc(onSizedChangedDelegate));
-
-            //var onLocationChangedDelegate = (LocationChangedDelegate)this.OnLocationChanged;
-            //_gcHandlesToFree.Add(GCHandle.Alloc(onLocationChangedDelegate));
-
-            //var onWebMessageReceivedDelegate = (WebMessageReceivedDelegate)this.OnWebMessageReceived;
-            //_gcHandlesToFree.Add(GCHandle.Alloc(onWebMessageReceivedDelegate));
+           
 
             // Configure Photino instance
             var options = new PhotinoWindowOptions();
@@ -765,125 +756,27 @@ namespace PeakSWC.RemotePhotinoNET
 
             this.RegisterEventHandlersFromOptions(options);
 
+
+           
+            // TODO Need to set up JSRuntime first 
+            //this.Title = title;
+
             // Fire pre-create event handlers
             this.OnWindowCreating();
 
-            // Create window
-            this.Title = title;
-
-            //_id = Guid.NewGuid();
-            //_parent = options.Parent;
-            //_nativeInstance = Photino_ctor(_title, (_parent as RemotePhotinoWindow)?._nativeInstance ?? default, onWebMessageReceivedDelegate, fullscreen, left, top, width, height);
-
-            // Register handlers that depend on an existing
-            // Photino.Native instance.
             foreach (var (scheme, handler) in options.CustomSchemeHandlers)
             {
                 this.RegisterCustomSchemeHandler(scheme, handler);
             }
 
-            //Invoke(() => Photino_SetResizedCallback(_nativeInstance, onSizedChangedDelegate));
-            //Invoke(() => Photino_SetMovedCallback(_nativeInstance, onLocationChangedDelegate));
-            //Invoke(() => Photino_SetClosingCallback(_nativeInstance, onClosingDelegate));
-
-            // Manage parent / child relationship
-            //if (_parent != null)
-            //{
-            //    this.Parent = _parent;
-            //    this.Parent.AddChild(this);
-            //}
-
             // Fire post-create event handlers
             this.OnWindowCreated();
         }
 
-        /// <summary>
-        /// PhotinoWindow Destructor
-        /// </summary>
-        ~RemotePhotinoWindow()
-        {
-            this.Dispose();
-        }
-
-        /// <summary>
-        /// Dispatches an Action to the UI thread.
-        /// </summary>
-        /// <param name="workItem"></param>
-        //private void Invoke(Action workItem)
-        //{
-        //    // If we're already on the UI thread, no need to dispatch
-        //    if (Thread.CurrentThread.ManagedThreadId == _managedThreadId)
-        //    {
-        //        workItem();
-        //    }
-        //    else
-        //    {
-        //        //Photino_Invoke(_nativeInstance, workItem.Invoke);
-        //    }
-        //}
-
-        // Does not get called when window is closed using
-        // the UI close button of the window chrome.
-        // Works when calling this.Close(). This might very
-        // well not be the right way to do it. An interop
-        // method is most likely needed to handle closing
-        // and associated events.
         public void Dispose()
         {
-            // Remove the window from a potential parent window.
-            // Prevent disposal of child by marking the child
-            // window as being in the process of being disposed.
-            // This prevents the recursive execution of Dispose().
-            //this.Parent?.RemoveChild(this, true);
-
-            // Make sure all children of a window get closed.
-            //this.Children
-            //    .ToList()
-            //    .ForEach(child => { child.Close(); });
-
-            //Invoke(() => Photino_SetResizedCallback(_nativeInstance, null));
-            //Invoke(() => Photino_SetMovedCallback(_nativeInstance, null));
-            //Invoke(() => Photino_SetClosingCallback(_nativeInstance, null));
-
-            //Photino_dtor(_nativeInstance);
-
-            //foreach (var gcHandle in _gcHandlesToFree)
-            //{
-            //    gcHandle.Free();
-            //}
-            //_gcHandlesToFree.Clear();
-
-            //foreach (var handle in _hGlobalToFree)
-            //{
-            //    Marshal.FreeHGlobal(handle);
-            //}
-            //_hGlobalToFree.Clear();
+            
         }
-
-        
-
-       
-
-       
-
-       
-        
-
-       
-       
-
-        
-
-       
-
-       
-       
-
-       
-
-        
-        
-      
 
         /// <summary>
         /// Moves the window to the specified location
