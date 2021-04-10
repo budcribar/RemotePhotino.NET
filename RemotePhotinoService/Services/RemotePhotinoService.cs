@@ -6,6 +6,7 @@ using PhotinoNET;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Channels;
@@ -87,7 +88,7 @@ namespace PeakSWC.RemotePhotinoNET
         }
         public override async Task CreateWebWindow(CreateWebWindowRequest request, IServerStreamWriter<WebMessageResponse> responseStream, ServerCallContext context)
         {
-           
+            Debug.WriteLine($"https://localhost/app?guid={request.Id}");
             if (!_webWindowDictionary.ContainsKey(request.Id))
             {
                 ServiceState state = new()

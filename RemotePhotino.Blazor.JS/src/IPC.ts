@@ -47,8 +47,8 @@ export function receiveMessage(message: string) {
 
         //TODO Hack required to get home displayed
         if (eventName == "JS.EndInvokeDotNet" && args[0] == "1") {
-            //var id = window.location.pathname.split('/')[1];
-            //navigateTo(`/${id}/`, false);
+            var id = window.location.pathname.split('/')[1];
+            navigateTo(`/${id}/`, false);
             sendMessage("connected:");
         }
     }
