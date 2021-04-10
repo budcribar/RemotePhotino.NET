@@ -37,8 +37,7 @@
 
   <ItemGroup>
 	  <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Client" Link="Protos\remotephotino.proto" />
-	  <ProjectReference Include="..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj" />
-    <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
+	  <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 
 </Project>

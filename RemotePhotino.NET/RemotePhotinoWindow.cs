@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Net;
 using Microsoft.JSInterop;
-using Photino.Blazor;
+//using Photino.Blazor;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -50,7 +50,7 @@ namespace PeakSWC.RemotePhotinoNET
             {
                 lock (eventLock)
                 {
-                    JSRuntime.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { true });
+                    JSRuntime?.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { true });
                     SizeChangedEvent += value;
                 }
 
@@ -944,7 +944,8 @@ namespace PeakSWC.RemotePhotinoNET
         {
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OpenAlertWindow(string title, string message)");
-            
+
+            Client.ShowMessage(new ShowMessageRequest { Id = Id.ToString(), Body = message, Title = title });
             // Bug:
             // Closing the message shown with the OpenAlertWindow
             // method closes the sender window as well.

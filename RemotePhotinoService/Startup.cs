@@ -110,9 +110,9 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     // restart url
                     var id = context.Request.RouteValues["id"];
+                    if (id == null) return;
                     var sid = id.ToString();
                     if (sid == null) return;
-
                     ipcDictionary[sid].ReceiveMessage("booted:");
 
                     context.Response.Redirect($"/restart?guid={sid}");

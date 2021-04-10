@@ -5,23 +5,19 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotino.NET", "RemotePhotino.NET.csproj", "{1F8C927A-DBDA-4FCB-AE25-C433FAB52D5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.NET", "..\..\photino.NET\Photino.NET\Photino.NET.csproj", "{C4F8085F-DC33-462F-A933-774EC6E622A2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotinoService", "..\RemotePhotinoService\RemotePhotinoService.csproj", "{0194F0B6-94C3-42C3-B643-9348A65F930B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "..\UnitTests\UnitTests.csproj", "{CCCA5652-F4C4-432D-BC1E-09440B4CA40E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloPhotino.Blazor", "..\..\photino.Samples\Photino.HelloPhotino.Blazor\HelloPhotino.Blazor.csproj", "{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj", "{BCC157B6-7D34-481B-B76B-7EB49958FEB0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloRemotePhotino.Blazor", "..\HelloRemotePhotino.Blazor\HelloRemotePhotino.Blazor.csproj", "{DCD51D90-8CA9-4031-8D7D-0221C11DE253}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor.JS", "..\..\photino.Blazor\Photino.Blazor.JS\Photino.Blazor.JS.csproj", "{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotino.Blazor.JS", "..\RemotePhotino.Blazor.JS\RemotePhotino.Blazor.JS.csproj", "{2F4A0309-4D52-4794-B2D5-6BB9C2B4635C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemotePhotinoClient", "..\RemotePhotinoClient\RemotePhotinoClient.csproj", "{252596B0-9826-4AA0-8ADB-A68F347FDC03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotinoClient", "..\RemotePhotinoClient\RemotePhotinoClient.csproj", "{252596B0-9826-4AA0-8ADB-A68F347FDC03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.NET", "..\..\photino.NET\Photino.NET\Photino.NET.csproj", "{497BE302-AC97-42B8-83EC-3A8084D431A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj", "{4BAF38A2-5E3E-4575-8061-EE2412C5D649}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +35,6 @@ Global
 		{1F8C927A-DBDA-4FCB-AE25-C433FAB52D5B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F8C927A-DBDA-4FCB-AE25-C433FAB52D5B}.Release|x64.ActiveCfg = Release|Any CPU
 		{1F8C927A-DBDA-4FCB-AE25-C433FAB52D5B}.Release|x64.Build.0 = Release|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Debug|x64.Build.0 = Debug|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Release|x64.ActiveCfg = Release|Any CPU
-		{C4F8085F-DC33-462F-A933-774EC6E622A2}.Release|x64.Build.0 = Release|Any CPU
 		{0194F0B6-94C3-42C3-B643-9348A65F930B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0194F0B6-94C3-42C3-B643-9348A65F930B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0194F0B6-94C3-42C3-B643-9348A65F930B}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -63,22 +51,6 @@ Global
 		{CCCA5652-F4C4-432D-BC1E-09440B4CA40E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CCCA5652-F4C4-432D-BC1E-09440B4CA40E}.Release|x64.ActiveCfg = Release|Any CPU
 		{CCCA5652-F4C4-432D-BC1E-09440B4CA40E}.Release|x64.Build.0 = Release|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Debug|x64.Build.0 = Debug|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Release|x64.ActiveCfg = Release|Any CPU
-		{6C012F88-B4B4-4958-B89A-E3E9D1E6E91E}.Release|x64.Build.0 = Release|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Debug|x64.Build.0 = Debug|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Release|x64.ActiveCfg = Release|Any CPU
-		{BCC157B6-7D34-481B-B76B-7EB49958FEB0}.Release|x64.Build.0 = Release|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -87,14 +59,6 @@ Global
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Release|x64.ActiveCfg = Release|Any CPU
 		{DCD51D90-8CA9-4031-8D7D-0221C11DE253}.Release|x64.Build.0 = Release|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Debug|x64.Build.0 = Debug|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|x64.ActiveCfg = Release|Any CPU
-		{34573FB4-BC08-4D11-9D8A-8B53F1F35F33}.Release|x64.Build.0 = Release|Any CPU
 		{2F4A0309-4D52-4794-B2D5-6BB9C2B4635C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F4A0309-4D52-4794-B2D5-6BB9C2B4635C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F4A0309-4D52-4794-B2D5-6BB9C2B4635C}.Debug|x64.ActiveCfg = Debug|x64
@@ -111,6 +75,22 @@ Global
 		{252596B0-9826-4AA0-8ADB-A68F347FDC03}.Release|Any CPU.Build.0 = Release|Any CPU
 		{252596B0-9826-4AA0-8ADB-A68F347FDC03}.Release|x64.ActiveCfg = Release|Any CPU
 		{252596B0-9826-4AA0-8ADB-A68F347FDC03}.Release|x64.Build.0 = Release|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Debug|x64.Build.0 = Debug|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|x64.ActiveCfg = Release|Any CPU
+		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|x64.Build.0 = Release|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|x64.Build.0 = Debug|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|x64.ActiveCfg = Release|Any CPU
+		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
