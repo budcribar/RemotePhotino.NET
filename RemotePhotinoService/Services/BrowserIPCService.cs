@@ -46,6 +46,7 @@ namespace PeakSWC.RemotePhotinoNET
             Guid id = Guid.Parse(request.Id);
             if (!IPC.ContainsKey(id.ToString())) IPC.TryAdd(id.ToString(), new IPC());
             IPC[id.ToString()].ReceiveMessage(request.Request);
+
             return Task.FromResult<Empty>(new Empty());
         }
 

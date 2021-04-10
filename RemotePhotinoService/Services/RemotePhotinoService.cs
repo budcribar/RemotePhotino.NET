@@ -78,7 +78,7 @@ namespace PeakSWC.RemotePhotinoNET
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ExShutdown(id);
 

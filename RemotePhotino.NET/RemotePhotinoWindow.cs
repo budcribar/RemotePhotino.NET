@@ -210,7 +210,7 @@ namespace PeakSWC.RemotePhotinoNET
                     }, cts.Token);
 
                 }
-                Thread.Sleep(300000);
+                
                 return client;
             }
         }
@@ -252,12 +252,12 @@ namespace PeakSWC.RemotePhotinoNET
 
         public string Title
         {
-            get => JSRuntime.InvokeAsync<string>("RemotePhotino.title").Result;
+            get => JSRuntime?.InvokeAsync<string>("RemotePhotino.title").Result ?? "";
             set
             {
                 if (string.IsNullOrEmpty(value.Trim()))
                     value = "Untitled Window";
-                JSRuntime.InvokeVoidAsync("RemotePhotino.setTitle", new object[] { value.Trim() });
+                JSRuntime?.InvokeVoidAsync("RemotePhotino.setTitle", new object[] { value.Trim() });
             }
         }
 
@@ -732,7 +732,11 @@ namespace PeakSWC.RemotePhotinoNET
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".WaitForClose()");
 
-            //Invoke(() => Photino_WaitForExit(_nativeInstance));
+            while (true)
+            {
+                // TODO
+                Thread.Sleep(1000);
+            }
         }
 
         #region TODO

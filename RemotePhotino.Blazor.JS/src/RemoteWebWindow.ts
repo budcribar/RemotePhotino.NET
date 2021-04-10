@@ -71,7 +71,6 @@ export function initializeRemotePhotino() {
         },
 
         width: function () {
-
             return window.outerWidth;
         },
         setWidth: function (width) {
@@ -117,11 +116,7 @@ export function initializeRemotePhotino() {
             return window.resizeTo(size.width, size.height);
         },
 
-
-
-
         showMessage: function (title,body) {
-
             window.alert(body);
         }
     };
