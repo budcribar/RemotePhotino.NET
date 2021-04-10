@@ -62,7 +62,7 @@ namespace PeakSWC.RemotePhotinoNET
                     SizeChangedEvent -= value;
 
                     if (LocationChangedEvent.GetInvocationList().Length == 0)
-                        JSRuntime.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { false });
+                        JSRuntime?.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { false });
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace PeakSWC.RemotePhotinoNET
             {
                 lock (eventLock)
                 {
-                    JSRuntime.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { true });
+                    JSRuntime?.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { true });
                     LocationChangedEvent += value;
                 }
 
@@ -88,7 +88,7 @@ namespace PeakSWC.RemotePhotinoNET
                     LocationChanged -= value;
 
                     if (LocationChangedEvent.GetInvocationList().Length == 0)
-                        JSRuntime.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { false });
+                        JSRuntime?.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { false });
                 }
             }
         }
@@ -264,7 +264,7 @@ namespace PeakSWC.RemotePhotinoNET
         private Size _lastSize;
         public Size Size
         {
-            get => JSRuntime.InvokeAsync<Size>("RemotePhotinio.size").Result;
+            get => JSRuntime?.InvokeAsync<Size>("RemotePhotinio.size").Result ?? new();
                
             set
             {
@@ -274,7 +274,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     _width = value.Width;
                     _height = value.Height;
-                    JSRuntime.InvokeVoidAsync("RemotePhotino.setSize", new object[] { new Size(_width,_height) });
+                    JSRuntime?.InvokeVoidAsync("RemotePhotino.setSize", new object[] { new Size(_width,_height) });
                 }
             }
         }
@@ -317,7 +317,7 @@ namespace PeakSWC.RemotePhotinoNET
         {
             get
             {
-                var p = JSRuntime.InvokeAsync<Point>("RemotePhotino.location").Result;
+                var p = JSRuntime?.InvokeAsync<Point>("RemotePhotino.location").Result ?? new();
                 _left = p.X;
                 _top = p.Y;
                 return p;
@@ -328,7 +328,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     _left = value.X;
                     _top = value.Y;
-                    JSRuntime.InvokeVoidAsync("RemotePhotino.setLocation", new object[] { new Point(value.X, value.Y) });
+                    JSRuntime?.InvokeVoidAsync("RemotePhotino.setLocation", new object[] { new Point(value.X, value.Y) });
                 }
             }
         }
@@ -740,8 +740,6 @@ namespace PeakSWC.RemotePhotinoNET
         }
 
         #region TODO
-
-
 
 
         // Static API Members

@@ -62,7 +62,7 @@ namespace PeakSWC.RemotePhotinoNET
 
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new FileResolver(app.ApplicationServices.GetService<ConcurrentDictionary<string, ServiceState>>()),
+                FileProvider = new FileResolver(app.ApplicationServices?.GetService<ConcurrentDictionary<string, ServiceState>>() ?? new()),
             });
 
             app.UseEndpoints(endpoints =>
