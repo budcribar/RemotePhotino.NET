@@ -1,4 +1,4 @@
-import '@dotnet/jsinterop/dist/Microsoft.JSInterop';
+import { DotNet } from '@microsoft/dotnet-js-interop';
 import '@browserjs/GlobalExports';
 import { setEventDispatcher } from '@browserjs/Rendering/RendererEventDispatcher';
 import { internalFunctions as navigationManagerFunctions } from '@browserjs/Services/NavigationManager';
@@ -6,6 +6,7 @@ import { decode } from 'base64-arraybuffer';
 import * as ipc from './IPC';
 import { RenderQueue } from './RenderQueue';
 import { initializeRemotePhotino } from './RemoteWebWindow';
+import { attachRootComponentToElement, attachRootComponentToLogicalElement } from '@browserjs/Rendering/Renderer';
 
 
 function boot() {
@@ -28,10 +29,13 @@ function boot() {
         }
     });
 
+    window['Blazor']._internal.attachRootComponentToElement = attachRootComponentToElement;
+
     navigationManagerFunctions.enableNavigationInterception();
 
-    ipc.on('JS.BeginInvokeJS', (asyncHandle, identifier, argsJson) => {
-        DotNet.jsCallDispatcher.beginInvokeJSFromDotNet(asyncHandle, identifier, argsJson);
+    ipc.on('JS.BeginInvokeJS', (asyncHandle, identifier, argsJson, resultType, targetInstanceId) => {
+        // TODO Check parameters
+        DotNet.jsCallDispatcher.beginInvokeJSFromDotNet(asyncHandle, identifier, argsJson, resultType, targetInstanceId);
     });
 
     ipc.on('JS.EndInvokeDotNet', (callId, success, resultOrError) => {

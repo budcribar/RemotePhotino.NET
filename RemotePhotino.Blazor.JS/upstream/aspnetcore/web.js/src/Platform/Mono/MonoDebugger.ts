@@ -1,7 +1,8 @@
-import { getAssemblyNameFromUrl, getFileNameFromUrl } from '../Url';
+import { WebAssemblyResourceLoader } from '../WebAssemblyResourceLoader';
 
 const currentBrowserIsChrome = (window as any).chrome
   && navigator.userAgent.indexOf('Edge') < 0; // Edge pretends to be Chrome
+
 
 let hasReferencedPdbs = false;
 
@@ -9,9 +10,8 @@ export function hasDebuggingEnabled() {
   return hasReferencedPdbs && currentBrowserIsChrome;
 }
 
-export function attachDebuggerHotkey(loadAssemblyUrls: string[]) {
-  hasReferencedPdbs = loadAssemblyUrls
-    .some(url => /\.pdb$/.test(getFileNameFromUrl(url)));
+export function attachDebuggerHotkey(resourceLoader: WebAssemblyResourceLoader) {
+  hasReferencedPdbs = !!resourceLoader.bootConfig.resources.pdb;
 
   // Use the combination shift+alt+D because it isn't used by the major browsers
   // for anything else by default
@@ -26,7 +26,7 @@ export function attachDebuggerHotkey(loadAssemblyUrls: string[]) {
       if (!hasReferencedPdbs) {
         console.error('Cannot start debugging, because the application was not compiled with debugging enabled.');
       } else if (!currentBrowserIsChrome) {
-        console.error('Currently, only Edge(Chromium) or Chrome is supported for debugging.');
+        console.error('Currently, only Microsoft Edge (80+), or Google Chrome, are supported for debugging.');
       } else {
         launchDebugger();
       }

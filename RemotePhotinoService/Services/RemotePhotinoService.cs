@@ -129,6 +129,12 @@ namespace PeakSWC.RemotePhotinoNET
             return Task.FromResult<Empty>(new Empty());
         }
 
+        public override Task<Empty> ShowMessage(ShowMessageRequest request, ServerCallContext context)
+        {
+            Console.WriteLine(request.Body);
+            return Task.FromResult<Empty>(new Empty());
+        }
+
         public override Task<Empty> Show(IdMessageRequest request, ServerCallContext context)
         {
             return Task.FromResult<Empty>(new Empty());

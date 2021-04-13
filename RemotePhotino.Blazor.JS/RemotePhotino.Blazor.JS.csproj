@@ -16,15 +16,6 @@
     <WebpackInputs Include="**\*.ts" Exclude="node_modules\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="package-lock.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <WebpackInputs Remove="Boot.Desktop.ts" />
-    <WebpackInputs Remove="src\RemoteWebWindow.ts" />
-    <WebpackInputs Remove="src\RenderQueue.ts" />
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="dist\" />
@@ -35,7 +26,7 @@
     <Exec Command="npm install" />
   </Target>
 
-  <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\blazor.desktop.js" DependsOnTargets="EnsureNpmRestored">
+  <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\remote.blazor.desktop.js" DependsOnTargets="EnsureNpmRestored">
     <Exec Command="npm run build:debug" Condition="'$(Configuration)' == 'Debug'" />
     <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />
   </Target>
