@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj" />
+    <ProjectReference Include="..\Photino.Blazor\Photino.Blazor.csproj" />
     <ProjectReference Include="..\RemotePhotino.NET\RemotePhotino.NET.csproj" />
   </ItemGroup>
 

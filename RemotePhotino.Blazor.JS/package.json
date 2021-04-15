@@ -28,12 +28,12 @@
     "google-protobuf": "^3.15.8",
     "grpc-web": "^1.2.1",
     "jest": "^24.9.0",
-    "typescript": "^3.8.3",
     "rimraf": "^2.7.1",
     "ts-jest": "^24.3.0",
     "ts-loader": "^4.4.1",
     "ts-protoc-gen": "^0.14.0",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
+    "typescript": "^3.8.3",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },

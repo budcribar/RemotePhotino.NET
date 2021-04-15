@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotinoClient", "..\R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.NET", "..\..\photino.NET\Photino.NET\Photino.NET.csproj", "{497BE302-AC97-42B8-83EC-3A8084D431A6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\..\photino.Blazor\Photino.Blazor\Photino.Blazor.csproj", "{4BAF38A2-5E3E-4575-8061-EE2412C5D649}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\Photino.Blazor\Photino.Blazor.csproj", "{D60EC532-4226-48DB-86ED-F0122336F0AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,14 +83,14 @@ Global
 		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|x64.ActiveCfg = Release|Any CPU
 		{497BE302-AC97-42B8-83EC-3A8084D431A6}.Release|x64.Build.0 = Release|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Debug|x64.Build.0 = Debug|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|x64.ActiveCfg = Release|Any CPU
-		{4BAF38A2-5E3E-4575-8061-EE2412C5D649}.Release|x64.Build.0 = Release|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
