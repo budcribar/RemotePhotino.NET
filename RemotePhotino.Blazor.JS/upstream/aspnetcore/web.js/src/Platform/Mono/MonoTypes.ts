@@ -2,7 +2,7 @@ import { Pointer, System_String, System_Array, System_Object } from '../Platform
 
 // Mono uses this global to hang various debugging-related items on
 
-export interface MONO {
+declare interface MONO {
   loaded_files: string[];
   mono_wasm_runtime_ready (): void;
   mono_wasm_setenv (name: string, value: string): void;
@@ -12,7 +12,7 @@ export interface MONO {
 }
 
 // Mono uses this global to hold low-level interop APIs
-export interface BINDING {
+declare interface BINDING {
   mono_obj_array_new(length: number): System_Array<System_Object>;
   mono_obj_array_set(array: System_Array<System_Object>, index: Number, value: System_Object): void;
   js_string_to_mono_string(jsString: string): System_String;
