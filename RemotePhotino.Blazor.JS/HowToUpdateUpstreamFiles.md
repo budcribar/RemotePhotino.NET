@@ -12,20 +12,15 @@ Then, to update the contents of upstream/aspnetcore/web.js to the latest:
     git rm -rf upstream/aspnetcore
     git fetch --depth 1 aspnetcore
     git read-tree --prefix=Photino.Blazor.JS/upstream/aspnetcore/web.js -u aspnetcore/main:src/Components/Web.JS
-    git commit -m "Get Web.JS files from commit a294d64a45f"
+    git read-tree --prefix=RemotePhotino.Blazor.JS/upstream/aspnetcore/web.js -u v6.0.0-preview.3.21201.13:src/Components/Web.JS
+    git commit -m "Get Web.JS files from commit v6.0.0-preview.3.21201.13"
 
     When using these commands, replace:
 
     * `main` with the branch you want to fetch from
-    * `a294d64a45f` with the SHA of the commit you're fetching from
+    * `v6.0.0-preview.3.21201.13` with the TAG of the commit you're fetching from
 
     Longer term, we may consider publishing Components.Web.JS as a NuGet package
     with embedded .ts sources, so that it's possible to use inside a WebPack build
     without needing to clone its sources.
 
-
-    git remote add -t main --tags aspnetcore https://github.com/aspnet/AspNetCore.git
-
-    git read-tree --prefix=RemotePhotino.Blazor.JS/upstream/aspnetcore/web.js -u aspnetcore/main:src/Components/Web.JS v6.0.0-preview.3.21201.13
-    git read-tree --prefix=RemotePhotino.Blazor.JS/upstream/aspnetcore/web.js -u aspnetcore/v6.0.0-preview.3.21201.13:src/Components/Web.JS v6.0.0-preview.3.21201.13
-    git read-tree --prefix=RemotePhotino.Blazor.JS/upstream/aspnetcore/web.js -u aspnetcore/v6.0.0-preview.3.21201.13:src/Components/Web.JS
