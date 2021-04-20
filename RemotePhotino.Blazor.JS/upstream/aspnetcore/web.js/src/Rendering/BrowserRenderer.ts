@@ -1,11 +1,15 @@
 import { RenderBatch, ArrayBuilderSegment, RenderTreeEdit, RenderTreeFrame, EditType, FrameType, ArrayValues } from './RenderBatch/RenderBatch';
-import { EventDelegator } from './Events/EventDelegator';
+import { EventDelegator } from './EventDelegator';
+import { EventForDotNet, UIEventArgs, EventArgsType } from './EventForDotNet';
 import { LogicalElement, PermutationListEntry, toLogicalElement, insertLogicalChild, removeLogicalChild, getLogicalParent, getLogicalChild, createAndInsertLogicalContainer, isSvgElement, getLogicalChildrenArray, getLogicalSiblingEnd, permuteLogicalChildren, getClosestDomElement } from './LogicalElements';
 import { applyCaptureIdToElement } from './ElementReferenceCapture';
+import { EventFieldInfo } from './EventFieldInfo';
+import { dispatchEvent } from './RendererEventDispatcher';
 import { attachToEventDelegator as attachNavigationManagerToEventDelegator } from '../Services/NavigationManager';
 const selectValuePropname = '_blazorSelectValue';
 const sharedTemplateElemForParsing = document.createElement('template');
 const sharedSvgElemForParsing = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+const preventDefaultEvents: { [eventType: string]: boolean } = { submit: true };
 const rootComponentsPendingFirstRender: { [componentId: number]: LogicalElement } = {};
 const internalAttributeNamePrefix = '__internal_';
 const eventPreventDefaultAttributeNamePrefix = 'preventDefault_';
@@ -16,8 +20,13 @@ export class BrowserRenderer {
 
   private childComponentLocations: { [componentId: number]: LogicalElement } = {};
 
+  private browserRendererId: number;
+
   public constructor(browserRendererId: number) {
-    this.eventDelegator = new EventDelegator(browserRendererId);
+    this.browserRendererId = browserRendererId;
+    this.eventDelegator = new EventDelegator((event, eventHandlerId, eventArgs, eventFieldInfo) => {
+      raiseEvent(event, this.browserRendererId, eventHandlerId, eventArgs, eventFieldInfo);
+    });
 
     // We don't yet know whether or not navigation interception will be enabled, but in case it will be,
     // we wire up the navigation manager to the event delegator so it has the option to participate
@@ -450,6 +459,13 @@ export interface ComponentDescriptor {
   end: Node;
 }
 
+export interface EventDescriptor {
+  browserRendererId: number;
+  eventHandlerId: number;
+  eventArgsType: EventArgsType;
+  eventFieldInfo: EventFieldInfo | null;
+}
+
 function parseMarkup(markup: string, isSvg: boolean) {
   if (isSvg) {
     sharedSvgElemForParsing.innerHTML = markup || ' ';
@@ -473,6 +489,27 @@ function countDescendantFrames(batch: RenderBatch, frame: RenderTreeFrame): numb
     default:
       return 0;
   }
+}
+
+function raiseEvent(
+  event: Event,
+  browserRendererId: number,
+  eventHandlerId: number,
+  eventArgs: EventForDotNet<UIEventArgs>,
+  eventFieldInfo: EventFieldInfo | null
+): void {
+  if (preventDefaultEvents[event.type]) {
+    event.preventDefault();
+  }
+
+  const eventDescriptor = {
+    browserRendererId,
+    eventHandlerId,
+    eventArgsType: eventArgs.type,
+    eventFieldInfo: eventFieldInfo,
+  };
+
+  dispatchEvent(eventDescriptor, eventArgs.data);
 }
 
 function clearElement(element: Element) {

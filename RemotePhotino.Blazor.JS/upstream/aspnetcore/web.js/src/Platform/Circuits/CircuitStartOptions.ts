@@ -1,8 +1,7 @@
 import { LogLevel } from '../Logging/Logger';
-import { HubConnectionBuilder } from '@microsoft/signalr';
 
 export interface CircuitStartOptions {
-  configureSignalR: (builder: HubConnectionBuilder) => void;
+  configureSignalR: (builder: signalR.HubConnectionBuilder) => void;
   logLevel: LogLevel;
   reconnectionOptions: ReconnectionOptions;
   reconnectionHandler?: ReconnectionHandler;

@@ -6,12 +6,10 @@ export class CircuitDescriptor {
   public circuitId?: string;
 
   public components: ServerComponentDescriptor[];
-  public applicationState: string;
 
-  public constructor(components: ServerComponentDescriptor[], appState: string) {
+  public constructor(components: ServerComponentDescriptor[]) {
     this.circuitId = undefined;
     this.components = components;
-    this.applicationState = appState;
   }
 
   public reconnect(reconnection: signalR.HubConnection): Promise<boolean> {
@@ -36,8 +34,7 @@ export class CircuitDescriptor {
       'StartCircuit',
       navigationManagerFunctions.getBaseURI(),
       navigationManagerFunctions.getLocationHref(),
-      JSON.stringify(this.components.map(c => c.toRecord())),
-      this.applicationState || ''
+      JSON.stringify(this.components.map(c => c.toRecord()))
     );
 
     if (result) {

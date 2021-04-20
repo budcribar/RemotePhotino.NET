@@ -3,7 +3,6 @@ import { ReconnectDisplay } from './ReconnectDisplay';
 import { DefaultReconnectDisplay } from './DefaultReconnectDisplay';
 import { UserSpecifiedDisplay } from './UserSpecifiedDisplay';
 import { Logger, LogLevel } from '../Logging/Logger';
-import { Blazor } from '../../GlobalExports';
 
 export class DefaultReconnectionHandler implements ReconnectionHandler {
   private readonly _logger: Logger;
@@ -14,7 +13,7 @@ export class DefaultReconnectionHandler implements ReconnectionHandler {
   constructor(logger: Logger, overrideDisplay?: ReconnectDisplay, reconnectCallback?: () => Promise<boolean>) {
     this._logger = logger;
     this._reconnectionDisplay = overrideDisplay;
-    this._reconnectCallback = reconnectCallback || (() => (Blazor.reconnect as any)());
+    this._reconnectCallback = reconnectCallback || (() => window['Blazor'].reconnect());
   }
 
   onConnectionDown (options: ReconnectionOptions, error?: Error) {

@@ -1,6 +1,6 @@
 import '@microsoft/dotnet-js-interop';
 import { resetScrollAfterNextBatch } from '../Rendering/Renderer';
-import { EventDelegator } from '../Rendering/Events/EventDelegator';
+import { EventDelegator } from '../Rendering/EventDelegator';
 
 let hasEnabledNavigationInterception = false;
 let hasRegisteredNavigationEventListeners = false;
