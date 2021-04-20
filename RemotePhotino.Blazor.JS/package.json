@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@improbable-eng/grpc-web": "^0.14.0",
-    "@microsoft/dotnet-js-interop": "5.0.5",
+    "@microsoft/dotnet-js-interop": "^6.0.0-preview.1.21103.6",
     "@microsoft/signalr": "5.0.5",
     "@microsoft/signalr-protocol-msgpack": "5.0.5",
     "@types/base64-arraybuffer": "^0.1.0",
