@@ -24,3 +24,10 @@ Then, to update the contents of upstream/aspnetcore/web.js to the latest:
     with embedded .ts sources, so that it's possible to use inside a WebPack build
     without needing to clone its sources.
 
+
+    Next:
+
+    cd upstream\aspnetcore\web.js
+    yarn
+
+
