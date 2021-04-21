@@ -80,6 +80,6 @@
 
   <Target Name="RunWebpack" AfterTargets="ResolveReferences" Inputs="@(WebpackInputs)" Outputs="dist\remote.blazor.desktop.js" DependsOnTargets="EnsureNpmRestored">
     <Exec Command="yarn build:debug" Condition="'$(Configuration)' == 'Debug'" />
-    <Exec Command="npm run build:production" Condition="'$(Configuration)' != 'Debug'" />
+    <Exec Command="yarn build:production" Condition="'$(Configuration)' != 'Debug'" />
   </Target>
 </Project>

@@ -371,7 +371,7 @@
 
 "@microsoft/dotnet-js-interop@^6.0.0-preview.1.21103.6":
   version "6.0.0-preview.3.21201.13"
-  resolved "https://registry.yarnpkg.com/@microsoft/dotnet-js-interop/-/dotnet-js-interop-6.0.0-preview.3.21201.13.tgz#3e9e28e94a9b456bbe7ec196817eae1e203dbd8b"
+  resolved "https://registry.npmjs.org/@microsoft/dotnet-js-interop/-/dotnet-js-interop-6.0.0-preview.3.21201.13.tgz"
   integrity sha512-Fz6/SRGC6vy5AQ8ifLq2Pt3h7jhIDWD1RoCIr9kslWHupzdu/9twdZ7aZd0vqpe2OkDUBqHlceO0G93QFLy9+A==
 
 "@microsoft/signalr-protocol-msgpack@5.0.5":

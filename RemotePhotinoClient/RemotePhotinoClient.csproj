@@ -1,8 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+	  <!--
 	 <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+	 -->
     <SupportedPlatform>browser</SupportedPlatform>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -20,13 +22,13 @@
     </PackageReference>
     <PackageReference Include="Google.Protobuf" Version="3.15.8" />
     
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.0-preview.3.21201.13" />
-	  <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.0-preview.3.21201.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.5" />
+	  <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="5.0.5" />
 	  
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0-preview.3.21201.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.5" PrivateAssets="all" />
 	
-    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.0-preview.3.21201.13" />
-    <PackageReference Include="System.Net.Http.Json" Version="6.0.0-preview.3.21201.4" />
+    <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="5.0.5" />
+    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

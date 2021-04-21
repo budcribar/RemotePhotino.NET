@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.NET", "..\..\photin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photino.Blazor", "..\Photino.Blazor\Photino.Blazor.csproj", "{D60EC532-4226-48DB-86ED-F0122336F0AE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotino.Blazor.JS", "..\RemotePhotino.Blazor.JS\RemotePhotino.Blazor.JS.csproj", "{BFC3E707-59B3-465F-93FF-DADD2866F483}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|x64.ActiveCfg = Release|Any CPU
 		{D60EC532-4226-48DB-86ED-F0122336F0AE}.Release|x64.Build.0 = Release|Any CPU
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Debug|x64.ActiveCfg = Debug|x64
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Debug|x64.Build.0 = Debug|x64
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Release|x64.ActiveCfg = Release|x64
+		{BFC3E707-59B3-465F-93FF-DADD2866F483}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

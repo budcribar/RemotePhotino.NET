@@ -1,17 +1,23 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Components.RenderTree;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#if !IGNITOR
+using Microsoft.AspNetCore.Components.RenderTree;
+#endif
 
+#if IGNITOR
+namespace Ignitor
+#else
 namespace Microsoft.AspNetCore.Components.Server.Circuits
+#endif
 {
     // TODO: We should consider *not* having this type of infrastructure in the .Server
     // project, but instead in some new project called .Remote or similar, since it
-    // would also be used in Desktop and possibly WebWorker cases.
+    // would also be used in Electron and possibly WebWorker cases.
 
     /// <summary>
     /// Provides a custom binary serializer for <see cref="RenderBatch"/> instances.

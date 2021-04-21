@@ -10,8 +10,9 @@ namespace Photino.Blazor
         [JSInvokable(nameof(DispatchEvent))]
         public static async Task DispatchEvent(WebEventDescriptor eventDescriptor, string eventArgsJson)
         {
-            var webEvent = WebEventData.Parse(eventDescriptor, eventArgsJson);
+            
             var renderer = ComponentsDesktop.DesktopRenderer;
+            var webEvent = WebEventData.Parse(renderer,eventDescriptor, eventArgsJson);
             await renderer.DispatchEventAsync(
                 webEvent.EventHandlerId,
                 webEvent.EventFieldInfo,
