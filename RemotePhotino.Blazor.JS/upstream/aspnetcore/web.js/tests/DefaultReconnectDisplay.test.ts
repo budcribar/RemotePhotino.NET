@@ -29,7 +29,7 @@ describe('DefaultReconnectDisplay', () => {
         expect(display.button.style.display).toBe('none');
 
         // Visibility changes asynchronously to allow animation
-        return new Promise<void>(resolve => setTimeout(() => {
+        return new Promise(resolve => setTimeout(() => {
             expect(element!.style.visibility).toBe('visible');
             resolve();
         }, 1));

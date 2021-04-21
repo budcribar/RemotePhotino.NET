@@ -12,29 +12,28 @@ export class NullLogger implements Logger {
 }
 
 export class ConsoleLogger implements Logger {
-  private readonly minLevel: LogLevel;
+  private readonly minimumLogLevel: LogLevel;
 
   public constructor(minimumLogLevel: LogLevel) {
-    this.minLevel = minimumLogLevel;
+    this.minimumLogLevel = minimumLogLevel;
   }
 
   public log(logLevel: LogLevel, message: string | Error): void {
-    if (logLevel >= this.minLevel) {
-      const msg = `[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`;
+    if (logLevel >= this.minimumLogLevel) {
       switch (logLevel) {
         case LogLevel.Critical:
         case LogLevel.Error:
-          console.error(msg);
+          console.error(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
           break;
         case LogLevel.Warning:
-          console.warn(msg);
+          console.warn(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
           break;
         case LogLevel.Information:
-          console.info(msg);
+          console.info(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
           break;
         default:
           // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
-          console.log(msg);
+          console.log(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
           break;
       }
     }
