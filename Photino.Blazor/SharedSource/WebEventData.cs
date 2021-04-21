@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.Components.Web
                 eventDescriptor.BrowserRendererId,
                 eventDescriptor.EventHandlerId,
                 InterpretEventFieldInfo(eventDescriptor.EventFieldInfo),
-                ParseEventArgsJson(eventDescriptor.EventHandlerId, eventDescriptor.EventName, eventArgsJson));
+                ParseEventArgsJson(eventDescriptor.EventHandlerId, eventDescriptor.EventArgsType, eventArgsJson));
         }
 
         private WebEventData(int browserRendererId, ulong eventHandlerId, EventFieldInfo eventFieldInfo, EventArgs eventArgs)
