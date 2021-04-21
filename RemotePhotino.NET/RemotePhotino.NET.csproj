@@ -26,7 +26,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.JSInterop" Version="6.0.0-preview.1.21103.6" />
+    <PackageReference Include="Microsoft.JSInterop" Version="6.0.0-preview.3.21201.13" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	
   </ItemGroup>
