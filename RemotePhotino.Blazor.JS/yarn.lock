@@ -369,10 +369,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@microsoft/dotnet-js-interop@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.npmjs.org/@microsoft/dotnet-js-interop/-/dotnet-js-interop-5.0.5.tgz"
-  integrity sha512-v2p3v0lLVSW5RjGWqXm9cR2Qnwc6rFhizMRhzoPpyDSuQcwnV2ek2llDiUbVXccKc2bPO6VWNr6dIK+d7zfBEw==
+"@microsoft/dotnet-js-interop@^6.0.0-preview.1.21103.6":
+  version "6.0.0-preview.3.21201.13"
+  resolved "https://registry.yarnpkg.com/@microsoft/dotnet-js-interop/-/dotnet-js-interop-6.0.0-preview.3.21201.13.tgz#3e9e28e94a9b456bbe7ec196817eae1e203dbd8b"
+  integrity sha512-Fz6/SRGC6vy5AQ8ifLq2Pt3h7jhIDWD1RoCIr9kslWHupzdu/9twdZ7aZd0vqpe2OkDUBqHlceO0G93QFLy9+A==
 
 "@microsoft/signalr-protocol-msgpack@5.0.5":
   version "5.0.5"

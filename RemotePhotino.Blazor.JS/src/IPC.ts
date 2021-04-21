@@ -1,5 +1,5 @@
 import { sendMessage } from "./RemoteWebWindow";
-import { navigateTo } from "../upstream/aspnetcore/web.js/src/Services/NavigationManager"
+import { internalFunctions  } from "../upstream/aspnetcore/web.js/src/Services/NavigationManager"
 interface Callback {
     (...args: any[]): void;
 }
@@ -48,7 +48,7 @@ export function receiveMessage(message: string) {
         //TODO Hack required to get home displayed
         if (eventName == "JS.EndInvokeDotNet" && args[0] == "1") {
             var id = window.location.pathname.split('/')[1];
-            navigateTo(`/${id}/`, false);
+            internalFunctions.navigateTo(`/${id}/`, false);
             sendMessage("connected:");
         }
     }
