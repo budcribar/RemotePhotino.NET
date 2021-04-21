@@ -1,6 +1,7 @@
 import { DotNet } from '@microsoft/dotnet-js-interop';
 import '@browserjs/GlobalExports';
-import { setEventDispatcher } from '@browserjs/Rendering/RendererEventDispatcher';
+import { setEventDispatcher } from '../upstream/aspnetcore/web.js/src/Rendering/Events/EventDispatcher';
+//import { setEventDispatcher } from '@browserjs/Rendering/RendererEventDispatcher';
 import { internalFunctions as navigationManagerFunctions } from '@browserjs/Services/NavigationManager';
 import { decode } from 'base64-arraybuffer';
 import * as ipc from './IPC';
