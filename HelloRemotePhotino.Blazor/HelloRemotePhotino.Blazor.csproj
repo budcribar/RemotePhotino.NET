@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <OutputType>WinExe</OutputType>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
