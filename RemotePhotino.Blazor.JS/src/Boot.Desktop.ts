@@ -35,7 +35,6 @@ function boot() {
     navigationManagerFunctions.enableNavigationInterception();
 
     ipc.on('JS.BeginInvokeJS', (asyncHandle, identifier, argsJson, resultType, targetInstanceId) => {
-        // TODO Check parameters
         DotNet.jsCallDispatcher.beginInvokeJSFromDotNet(asyncHandle, identifier, argsJson, resultType, targetInstanceId);
     });
 
@@ -56,8 +55,6 @@ function boot() {
     ipc.send('components:init', [
         navigationManagerFunctions.getLocationHref().replace(/\/index\.html$/, ''),
         navigationManagerFunctions.getBaseURI()]);
-   
-
 }
 
   
