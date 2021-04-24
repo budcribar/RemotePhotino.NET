@@ -6,20 +6,37 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <DefaultItemExcludes>${DefaultItemExcludes};node_modules\**</DefaultItemExcludes>
     <IsPackable>false</IsPackable>
-    
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <!-- VS's FastUpToDateCheck doesn't consider .ts file changes, so it's necessary to disable it to get incremental builds to work correctly (albeit not as fast as if FastUpToDateCheck did work for them) -->
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
-    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*" />
+    <None Remove="**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="**\*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <WebpackInputs Include="**\*.ts" Exclude="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Remove="%2a%2a/%2a.resx" />
+  </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="%2a%2a\" />
     <Folder Include="dist\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="HowToUpdateUpstreamFiles.md" />
+  </ItemGroup>
+
 
   <Target Name="EnsureNpmRestored" Condition="!Exists('node_modules')">
     <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
