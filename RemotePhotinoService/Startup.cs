@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -26,7 +29,8 @@ namespace PeakSWC.RemotePhotinoNET
             services.AddSingleton(ipcDictionary);
             services.AddSingleton(rootDictionary);
             services.AddSingleton(serviceStateChannel);
-
+            services.AddResponseCompression(options => { 
+                options.MimeTypes = new[] { "application/octet-stream", "application/wasm" }; });
             services.AddGrpc();
 
             services.AddCors(o =>
@@ -55,14 +59,26 @@ namespace PeakSWC.RemotePhotinoNET
             }
 
             app.UseCors("CorsPolicy");
-
+            app.UseResponseCompression();
             app.UseRouting();
 
             app.UseGrpcWeb();
 
+            var provider = new FileExtensionContentTypeProvider();
+            // Add new mappings
+            provider.Mappings[".blat"] = "application/octet-stream";
+            provider.Mappings[".dll"] = "application/octet-stream";
+            provider.Mappings[".dat"] = "application/octet-stream";
+            provider.Mappings[".json"] = "application/json";
+            provider.Mappings[".wasm"] = "application/wasm";
+            provider.Mappings[".woff"] = "application/font-woff";
+            provider.Mappings[".woff2"] = "application/font-woff";
+
+            app.UseRewriter(new Microsoft.AspNetCore.Rewrite.RewriteOptions().AddRewrite("^wwwroot$", "wwwroot/index.html", false));
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new FileResolver(app.ApplicationServices?.GetService<ConcurrentDictionary<string, ServiceState>>() ?? new()),
+                FileProvider = new CompositeFileProvider(new FileResolver(app.ApplicationServices?.GetService<ConcurrentDictionary<string, ServiceState>>() ?? new()), new ManifestEmbeddedFileProvider(typeof(RemotePhotinoService).Assembly)),
+                ContentTypeProvider = provider
             });
 
             app.UseEndpoints(endpoints =>
@@ -120,10 +136,12 @@ namespace PeakSWC.RemotePhotinoNET
                 });
 
 
-                //endpoints.MapGet("/", async context =>
-                //{
-                //    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-                //});
+                endpoints.MapGet("/", async context =>
+                {
+                    context.Response.Redirect("wwwroot");
+                    await Task.CompletedTask;
+                });
+
             });
         }
     }

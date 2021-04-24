@@ -1,38 +1,50 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5</TargetFramework>
-	<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-	<OutputType>Exe</OutputType>
-	 <!--
-	<Platforms>x64</Platforms>
-	-->
-	<Nullable>enable</Nullable>
-	<LangVersion>latest</LangVersion>
-	<PackAsTool>true</PackAsTool>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageId>PeakSWC.RemotePhotinoService</PackageId>
-	<ToolCommandName>RemotePhotinoService</ToolCommandName>
-	<Authors>Bud Cribar</Authors>
-	<Company>Peak Software Consulting, LLC</Company>
-	<Description>This package will transport the user interface from an app built using RemotePhotino.net to a server running in the cloud. This allows an app running behind a firewall to be accessed by browing to a web server hosted in the cloud.</Description>
-	<Copyright>Peak Software Consulting, LLC</Copyright>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageIcon>favico-32x32.png</PackageIcon>
-	<RepositoryUrl>https://github.com/budcribar/RemotePhotino.NET</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
-	<PackageTags>BlazorWebView, Blazor, WebView</PackageTags>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<OutputType>Exe</OutputType>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+    <!--
+    <IsPackable>true</IsPackable>
+		<PackAsTool>true</PackAsTool>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    -->
+		<PackageId>PeakSWC.RemotePhotinoService</PackageId>
+		<ToolCommandName>RemotePhotinoService</ToolCommandName>
+		<Authors>Bud Cribar</Authors>
+		<Company>Peak Software Consulting, LLC</Company>
+		<Description>This package will transport the user interface from an app built using RemotePhotino.net to a server running in the cloud. This allows an app running behind a firewall to be accessed by browing to a web server hosted in the cloud.</Description>
+		<Copyright>Peak Software Consulting, LLC</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>favicon-32x32.png</PackageIcon>
+		<RepositoryUrl>https://github.com/budcribar/RemotePhotino.NET</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>BlazorWebView, Blazor, WebView</PackageTags>
+		<ApplicationIcon>C:\Users\budcr\source\repos\RemotePhotino.NET\RemotePhotinoClient\publish\wwwroot\favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Protobuf Include="..\Protos\remotephotino.proto" GrpcServices="Server" Link="Protos\remotephotino.proto" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.36.0" />
-    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.36.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.37.0" />
+    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.37.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\RemotePhotinoClient\publish\wwwroot\**\*" LinkBase="wwwroot" />
     <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="favicon-32x32.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
