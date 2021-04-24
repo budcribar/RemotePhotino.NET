@@ -29,8 +29,13 @@
   <ItemGroup>
     <WebpackInputs Include="**\*.ts" Exclude="node_modules\**" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Remove="%2a%2a/%2a.resx" />
+  </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="%2a%2a\" />
     <Folder Include="dist\" />
   </ItemGroup>
 
