@@ -240,13 +240,13 @@ namespace PeakSWC.RemotePhotinoNET
         public IPhotinoWindow Parent => throw new NotImplementedException();
 
 
-        public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors => throw new NotImplementedException();
+        public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors => new List<PhotinoNET.Structs.Monitor>();
 
         public PhotinoNET.Structs.Monitor MainMonitor => throw new NotImplementedException();
 
         public List<IPhotinoWindow> Children  => throw new NotImplementedException();
 
-        public uint ScreenDpi => throw new NotImplementedException();
+        public uint ScreenDpi => 0;
 
         public IJSRuntime? JSRuntime { get; set; }
 
@@ -264,7 +264,7 @@ namespace PeakSWC.RemotePhotinoNET
         private Size _lastSize;
         public Size Size
         {
-            get => JSRuntime?.InvokeAsync<Size>("RemotePhotinio.size").Result ?? new();
+            get => JSRuntime?.InvokeAsync<Size>("RemotePhotino.size").Result ?? new();
                
             set
             {
@@ -408,7 +408,7 @@ namespace PeakSWC.RemotePhotinoNET
         /// <returns>The current IPhotinoWindow instance</returns>
         public IPhotinoWindow UserCanResize(bool isResizable = true)
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         /// <summary>
@@ -469,7 +469,7 @@ namespace PeakSWC.RemotePhotinoNET
             throw new NotImplementedException("Hide is not yet implemented in PhotinoNET.");
         }
 
-        public bool Resizable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool Resizable { get; set; } = true;
 
         /// <summary>
         /// Resizes the current window instance using a Size struct.
