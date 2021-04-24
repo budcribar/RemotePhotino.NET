@@ -1,8 +1,9 @@
 ﻿@page "/window"
-@inject RemotePhotinoWindow Window
+@inject IPhotinoWindow Window
 
 <h1>Window properties</h1>
 <h2>Screen size</h2>
+
 <p>DPI: @Window.ScreenDpi</p>
 @foreach (var (m, i) in Window.Monitors.Select((monitor, index) => (monitor, index)))
 {
