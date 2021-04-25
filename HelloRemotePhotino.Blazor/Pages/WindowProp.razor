@@ -1,5 +1,7 @@
 ﻿@page "/window"
+@using System.Drawing
 @inject IPhotinoWindow Window
+@implements IDisposable
 
 <h1>Window properties</h1>
 <h2>Screen size</h2>
@@ -54,10 +56,19 @@
 </div>
 
 @code {
+    private void LocationChanged(object sender, Point e)
+    {
+        StateHasChanged();
+    }
+    private void SizeChanged(object sender, Size e)
+    {
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
-        Window.SizeChanged += (sender, e) => StateHasChanged();
-        Window.LocationChanged += (sender, e) => StateHasChanged();
+        Window.SizeChanged += SizeChanged;
+        Window.LocationChanged += LocationChanged;
     }
 
     string iconFilename = "wwwroot/";
@@ -68,5 +79,11 @@
         {
             Window.SetIconFile(iconFilename);
         }
+    }
+
+    public void Dispose ()
+    {
+        Window.SizeChanged -= SizeChanged;
+        Window.LocationChanged -= LocationChanged;
     }
 }
