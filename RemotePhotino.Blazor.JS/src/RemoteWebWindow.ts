@@ -60,12 +60,12 @@ export function initializeRemotePhotino() {
 
 
     (<any>window).RemotePhotino = {
-        resizeEventHandlerAttached: true,
+        resizeEventHandlerAttached: false,
         setResizeEventHandlerAttached: function (value) {
             (<any>window).RemotePhotino.resizeEventHandlerAttached = value;
         },
 
-        locationEventHandlerAttached: true,
+        locationEventHandlerAttached: false,
         setLocationEventHandlerAttached: function (value) {
             (<any>window).RemotePhotino.locationEventHandlerAttached = value;
         },

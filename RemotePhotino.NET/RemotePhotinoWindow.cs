@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Net;
 using Microsoft.JSInterop;
-//using Photino.Blazor;
+using Photino.Blazor;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -162,9 +162,8 @@ namespace PeakSWC.RemotePhotinoNET
                                         }
                                         else if (data.StartsWith("location:"))
                                         {
+
                                             var location = data.Replace("location:", "");
-
-
 
                                             var jo = JsonConvert.DeserializeObject<JObject>(location);
                                             //var x = JsonConvert.DeserializeObject<Point>(location);
@@ -190,6 +189,11 @@ namespace PeakSWC.RemotePhotinoNET
                         {
                             OnWindowClosing();
                             Console.WriteLine("Stream cancelled.");  //TODO
+                        }
+                        catch (Exception ex)
+                        {
+                            // TODO
+                            // exceptions will stop ui 
                         }
                     }, cts.Token);
 
@@ -229,9 +233,7 @@ namespace PeakSWC.RemotePhotinoNET
         {
             if (this.LogVerbosity > 1)
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".SendWebMessage(string message)");
-
             Client.SendMessage(new SendMessageRequest { Id = Id.ToString(), Message = message }, new());
-
             return this;
         }
 
@@ -248,7 +250,17 @@ namespace PeakSWC.RemotePhotinoNET
 
         public uint ScreenDpi => 0;
 
-        public IJSRuntime? JSRuntime { get; set; }
+        private IJSRuntime? _JSRuntime = null;
+
+        public IJSRuntime? JSRuntime
+        {
+            get
+            {
+                if (_JSRuntime == null)
+                  _JSRuntime = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "DesktopJSRuntime").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as IJSRuntime;
+                return _JSRuntime;
+            }
+        }
 
         public string Title
         {
