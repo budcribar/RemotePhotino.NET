@@ -61,7 +61,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     SizeChangedEvent -= value;
 
-                    if (LocationChangedEvent.GetInvocationList().Length == 0)
+                    if (SizeChangedEvent == null || SizeChangedEvent.GetInvocationList().Length == 0)
                         JSRuntime?.InvokeVoidAsync("RemotePhotino.setResizeEventHandlerAttached", new object[] { false });
                 }
             }
@@ -85,9 +85,9 @@ namespace PeakSWC.RemotePhotinoNET
             {
                 lock (eventLock)
                 {
-                    LocationChanged -= value;
+                    LocationChangedEvent -= value;
 
-                    if (LocationChangedEvent.GetInvocationList().Length == 0)
+                    if (LocationChangedEvent == null || LocationChangedEvent.GetInvocationList()?.Length == 0 )
                         JSRuntime?.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { false });
                 }
             }
@@ -122,80 +122,80 @@ namespace PeakSWC.RemotePhotinoNET
                     var events = client.CreateWebWindow(new CreateWebWindowRequest { Id = Id.ToString(), HtmlHostPath = hostHtmlPath, Hostname = hostname }, cancellationToken: cts.Token); // TODO parameter names
                     var completed = new ManualResetEventSlim();
 
-                    Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await foreach (var message in events.ResponseStream.ReadAllAsync())
-                            {
-                                var command = message.Response.Split(':')[0];
-                                var data = message.Response.Substring(message.Response.IndexOf(':') + 1);
+                    _ = Task.Run(async () =>
+                      {
+                          try
+                          {
+                              await foreach (var message in events.ResponseStream.ReadAllAsync())
+                              {
+                                  var command = message.Response.Split(':')[0];
+                                  var data = message.Response.Substring(message.Response.IndexOf(':') + 1);
+                                  try
+                                  {
+                                      switch (command)
+                                      {
+                                          case "created":
+                                              completed.Set();
+                                              break;
+                                          case "webmessage":
+                                              if (data == "booted:")
+                                              {
+                                                  lock (bootLock)
+                                                  {
+                                                      Shutdown();
+                                                      WindowClosing?.Invoke(this, new());
+                                                  }
+                                              }
+                                              else if (data == "connected:")
+                                                  WindowCreated?.Invoke(this, new());
+                                              else if (data.StartsWith("size:"))
+                                              {
+                                                  var size = data.Replace("size:", "");
+                                                  var jo = JsonConvert.DeserializeObject<JObject>(size);
 
-                                switch (command)
-                                {
-                                    case "created":
-                                        completed.Set();
-                                        break;
-                                    case "webmessage":
-                                        if (data == "booted:")
-                                        {
-                                            lock (bootLock)
-                                            {
-                                                Shutdown();
-                                                WindowClosing?.Invoke(this, new());
-                                            }
-                                        }
-                                        else if (data == "connected:")
-                                            WindowCreated?.Invoke(this,new());
-                                        else if (data.StartsWith("size:"))
-                                        {
-                                            var size = data.Replace("size:", "");
-                                            var jo = JsonConvert.DeserializeObject<JObject>(size);
-
-                                            await Task.Run(() =>
-                                            {
-                                                // Hangs otherwise
-                                                SizeChangedEvent?.Invoke(null, new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0));
-                                            });
-
-
-                                        }
-                                        else if (data.StartsWith("location:"))
-                                        {
-
-                                            var location = data.Replace("location:", "");
-
-                                            var jo = JsonConvert.DeserializeObject<JObject>(location);
-                                            //var x = JsonConvert.DeserializeObject<Point>(location);
-
-                                            await Task.Run(() =>
-                                            {
-                                                // TODO Hangs otherwise
-                                                LocationChangedEvent?.Invoke(null, new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0));
-                                            });
+                                                  if (PlatformDispatcher != null)
+                                                      await PlatformDispatcher.InvokeAsync(() => {
+                                                          SizeChangedEvent?.Invoke(null, new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0));
+                                                  });
 
 
-                                        }
-                                        else
-                                            OnWebMessageReceived(data);
-                                        break;
+                                              }
+                                              else if (data.StartsWith("location:"))
+                                              { 
+                                                  var location = data.Replace("location:", "");
+
+                                                  var jo = JsonConvert.DeserializeObject<JObject>(location);
+
+                                                  if (PlatformDispatcher != null)
+                                                     await PlatformDispatcher.InvokeAsync(() => { 
+                                                         LocationChangedEvent?.Invoke(null, new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0)); 
+                                                     });
+                                              }
+                                              else
+                                                  OnWebMessageReceived(data);
+                                              break;
 
 
-                                }
+                                      }
+                                  }
+                                  catch (Exception ex)
+                                  {
+                                      var m = ex.Message;
+                                  }
 
-                            }
+                              }
+                          }
+                          catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+                          {
+                              OnWindowClosing();
+                              Console.WriteLine("Stream cancelled.");  //TODO
                         }
-                        catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
-                        {
-                            OnWindowClosing();
-                            Console.WriteLine("Stream cancelled.");  //TODO
-                        }
-                        catch (Exception ex)
-                        {
+                          catch (Exception ex)
+                          {
                             // TODO
                             // exceptions will stop ui 
                         }
-                    }, cts.Token);
+                      }, cts.Token);
 
                     completed.Wait();
 
@@ -249,6 +249,18 @@ namespace PeakSWC.RemotePhotinoNET
         public List<IPhotinoWindow> Children  => throw new NotImplementedException();
 
         public uint ScreenDpi => 0;
+
+        public PlatformDispatcher? _PlatformDispatcher = null;
+        public PlatformDispatcher? PlatformDispatcher
+        {
+            get
+            {
+                if (_PlatformDispatcher == null)
+                    _PlatformDispatcher = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "Dispatcher").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as PlatformDispatcher;
+                return _PlatformDispatcher;
+            }
+        }
+
 
         private IJSRuntime? _JSRuntime = null;
 

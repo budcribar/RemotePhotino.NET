@@ -23,6 +23,7 @@ namespace Photino.Blazor
         internal static DesktopJSRuntime DesktopJSRuntime { get; private set; }
         internal static DesktopRenderer DesktopRenderer { get; private set; }
         internal static IPhotinoWindow photinoWindow { get; private set; }
+        internal static PlatformDispatcher Dispatcher { get; private set; }
 
         public static void Run<TStartup>(IPhotinoWindow iphotinoWindow)
         {
@@ -62,6 +63,8 @@ namespace Photino.Blazor
                 appLifetimeCts.Cancel();
             }
         }
+
+       
 
         public static Action<PhotinoWindowOptions> StandardOptions(string hostHtmlPath)
         {
@@ -129,9 +132,9 @@ namespace Photino.Blazor
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
 
-            var dispatcher = new PlatformDispatcher(appLifetime);
+            Dispatcher = new PlatformDispatcher(appLifetime);
 
-            dispatcher.Context.UnhandledException += (sender, exception) =>
+            Dispatcher.Context.UnhandledException += (sender, exception) =>
             {
                 UnhandledException(exception);
             };
@@ -142,7 +145,7 @@ namespace Photino.Blazor
             completed.Set();
 
             // await PerformHandshakeAsync(ipc);
-            AttachJsInterop(ipc, dispatcher.Context, appLifetime);
+            AttachJsInterop(ipc, Dispatcher.Context, appLifetime);
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<IConfiguration>(configurationBuilder.Build());
@@ -161,7 +164,7 @@ namespace Photino.Blazor
 
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
-            DesktopRenderer = new DesktopRenderer(services, ipc, loggerFactory, DesktopJSRuntime, dispatcher);
+            DesktopRenderer = new DesktopRenderer(services, ipc, loggerFactory, DesktopJSRuntime, Dispatcher);
             DesktopRenderer.UnhandledException += (sender, exception) =>
             {
                 Console.Error.WriteLine(exception);
@@ -171,7 +174,7 @@ namespace Photino.Blazor
 
             foreach (var rootComponent in builder.Entries)
             {
-                await dispatcher.InvokeAsync(async () => await DesktopRenderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector));
+                await Dispatcher.InvokeAsync(async () => await DesktopRenderer.AddComponentAsync(rootComponent.componentType, rootComponent.domElementSelector));
             }
 
             // TODO this was in BlazorDesktopToBrowser

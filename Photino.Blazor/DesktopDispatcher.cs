@@ -8,7 +8,7 @@ namespace Photino.Blazor
     /// <summary>
     /// A dispatcher that does not dispatch but invokes directly.
     /// </summary>
-    internal class PlatformDispatcher : Dispatcher
+    public class PlatformDispatcher : Dispatcher
     {
         private readonly DesktopSynchronizationContext context;
 
