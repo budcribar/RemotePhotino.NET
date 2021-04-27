@@ -24,16 +24,16 @@ namespace PeakSWC.RemotePhotinoNET
     {
         private RemotePhotinoServiceProto.RemotePhotinoServiceProtoClient? client = null;
         private readonly Uri uri;
-        private readonly CancellationTokenSource cts = new ();
+        private readonly CancellationTokenSource cts = new();
 
         // TODO
         //private readonly string windowTitle;
         private readonly string hostHtmlPath;
         private readonly string hostname;
-        private readonly object bootLock = new ();
+        private readonly object bootLock = new();
 
         private Func<string, Stream?> FrameworkFileResolver { get; } = SupplyFrameworkFile;
-      
+
         private Point _lastLocation;
 
         public Guid Id { get; set; }
@@ -87,7 +87,7 @@ namespace PeakSWC.RemotePhotinoNET
                 {
                     LocationChangedEvent -= value;
 
-                    if (LocationChangedEvent == null || LocationChangedEvent.GetInvocationList()?.Length == 0 )
+                    if (LocationChangedEvent == null || LocationChangedEvent.GetInvocationList()?.Length == 0)
                         JSRuntime?.InvokeVoidAsync("RemotePhotino.setLocationEventHandlerAttached", new object[] { false });
                 }
             }
@@ -150,26 +150,33 @@ namespace PeakSWC.RemotePhotinoNET
                                                   WindowCreated?.Invoke(this, new());
                                               else if (data.StartsWith("size:"))
                                               {
-                                                  var size = data.Replace("size:", "");
-                                                  var jo = JsonConvert.DeserializeObject<JObject>(size);
 
+                                                  var jo = JsonConvert.DeserializeObject<JObject>(data.Replace("size:", ""));
+                                                  var size = new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0);
+                                                  this.InitSize = size;
+                                                  // TODO don't throw size changed on initial set
                                                   if (PlatformDispatcher != null)
                                                       await PlatformDispatcher.InvokeAsync(() => {
-                                                          SizeChangedEvent?.Invoke(null, new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0));
-                                                  });
+                                                          SizeChangedEvent?.Invoke(null, size);
+                                                      });
 
 
                                               }
                                               else if (data.StartsWith("location:"))
-                                              { 
-                                                  var location = data.Replace("location:", "");
+                                              {
 
-                                                  var jo = JsonConvert.DeserializeObject<JObject>(location);
 
+                                                  var jo = JsonConvert.DeserializeObject<JObject>(data.Replace("location:", ""));
+                                                  var location = new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0);
+                                                  InitLocation = location;
                                                   if (PlatformDispatcher != null)
-                                                     await PlatformDispatcher.InvokeAsync(() => { 
-                                                         LocationChangedEvent?.Invoke(null, new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0)); 
-                                                     });
+                                                      await PlatformDispatcher.InvokeAsync(() => {
+                                                          LocationChangedEvent?.Invoke(null, location);
+                                                      });
+                                              }
+                                              else if (data.StartsWith("title:"))
+                                              {
+                                                  InitTitle = data.Replace("title:", "").Trim();
                                               }
                                               else
                                                   OnWebMessageReceived(data);
@@ -189,12 +196,12 @@ namespace PeakSWC.RemotePhotinoNET
                           {
                               OnWindowClosing();
                               Console.WriteLine("Stream cancelled.");  //TODO
-                        }
+                          }
                           catch (Exception ex)
                           {
-                            // TODO
-                            // exceptions will stop ui 
-                        }
+                              // TODO
+                              // exceptions will stop ui 
+                          }
                       }, cts.Token);
 
                     completed.Wait();
@@ -214,7 +221,7 @@ namespace PeakSWC.RemotePhotinoNET
                     }, cts.Token);
 
                 }
-                
+
                 return client;
             }
         }
@@ -238,15 +245,14 @@ namespace PeakSWC.RemotePhotinoNET
         }
 
         public IntPtr WindowHandle => throw new NotImplementedException();
-       
-        public IPhotinoWindow Parent => throw new NotImplementedException();
 
+        public IPhotinoWindow Parent => throw new NotImplementedException();
 
         public IReadOnlyList<PhotinoNET.Structs.Monitor> Monitors => new List<PhotinoNET.Structs.Monitor>();
 
         public PhotinoNET.Structs.Monitor MainMonitor => throw new NotImplementedException();
 
-        public List<IPhotinoWindow> Children  => throw new NotImplementedException();
+        public List<IPhotinoWindow> Children => throw new NotImplementedException();
 
         public uint ScreenDpi => 0;
 
@@ -269,14 +275,17 @@ namespace PeakSWC.RemotePhotinoNET
             get
             {
                 if (_JSRuntime == null)
-                  _JSRuntime = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "DesktopJSRuntime").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as IJSRuntime;
+                    _JSRuntime = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "DesktopJSRuntime").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as IJSRuntime;
                 return _JSRuntime;
             }
         }
 
+        private string InitTitle {set {_title = string.IsNullOrEmpty(value.Trim()) ? "Untitled Window" : value; } }
+
+        private string _title;
         public string Title
         {
-            get => JSRuntime?.InvokeAsync<string>("RemotePhotino.title").Result ?? "";
+            get => _title;
             set
             {
                 if (string.IsNullOrEmpty(value.Trim()))
@@ -285,10 +294,12 @@ namespace PeakSWC.RemotePhotinoNET
             }
         }
 
+        private Size InitSize { set { _lastSize = value;  } }
+
         private Size _lastSize;
         public Size Size
         {
-            get => JSRuntime?.InvokeAsync<Size>("RemotePhotino.size").Result ?? new();
+            get => _lastSize;
                
             set
             {
@@ -335,16 +346,13 @@ namespace PeakSWC.RemotePhotinoNET
             }
         }
         
-        //public Point Location { get { var l = JSRuntime.InvokeAsync<Point>("RemoteWebWindow.location").Result; return new Point(l.X, l.Y); } set => JSRuntime.InvokeVoidAsync("RemoteWebWindow.setLocation", new object[] { value }); }
+        private Point InitLocation { set { _left = value.X; _top = value.Y; } }
 
         public Point Location
         {
             get
             {
-                var p = JSRuntime?.InvokeAsync<Point>("RemotePhotino.location").Result ?? new();
-                _left = p.X;
-                _top = p.Y;
-                return p;
+                return new Point { X = _left, Y = _top };
             }
             set
             {

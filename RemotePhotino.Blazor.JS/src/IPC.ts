@@ -50,6 +50,9 @@ export function receiveMessage(message: string) {
             var id = window.location.pathname.split('/')[1];
             navigateTo(`/${id}/`, false);
             sendMessage("connected:");
+            sendMessage("size:" + JSON.stringify((<any>window).RemotePhotino.size()));
+            sendMessage("location:" + JSON.stringify((<any>window).RemotePhotino.location()));
+            sendMessage("title:" + window.document.title);
         }
     }
 }
