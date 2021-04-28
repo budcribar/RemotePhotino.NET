@@ -14,18 +14,16 @@ namespace PeakSWC.RemotePhotinoNET
         private ConcurrentDictionary<string, IPC> IPC { get; set; }
         private ConcurrentDictionary<string, BrowserIPCState> stateDict { get; init; }
         private volatile bool shutdown = false;
-        //private static uint sequenceNum = 1;
-        //private static object syncLock = new();
-        //private static ConcurrentDictionary<uint, SendSequenceMessageRequest> messageDict = new ();
 
         public BrowserIPCService(ILogger<BrowserIPCService> logger, ConcurrentDictionary<string, IPC> ipc, ConcurrentDictionary<string, BrowserIPCState> state)
         {
-            _logger = logger;
-            
+            _logger = logger;        
             IPC = ipc;
-            this.stateDict = state;
+            stateDict = state;
         }
 
+
+        // TODO where is this called and per client?
         public void Shutdown()
         {
             _logger.LogInformation("Shutting down.");
@@ -48,17 +46,16 @@ namespace PeakSWC.RemotePhotinoNET
 
         public override Task<Empty> SendMessage(SendSequenceMessageRequest request, ServerCallContext context)
         {
-            Guid id = Guid.Parse(request.Id);
-            if (!IPC.ContainsKey(id.ToString())) IPC.TryAdd(id.ToString(), new IPC());
-            if (!stateDict.ContainsKey(id.ToString())) stateDict.TryAdd(id.ToString(), new BrowserIPCState());
+            if (!IPC.ContainsKey(request.Id)) IPC.TryAdd(request.Id, new IPC());
+            if (!stateDict.ContainsKey(request.Id)) stateDict.TryAdd(request.Id, new BrowserIPCState());
 
-            var state = stateDict[id.ToString()];
+            var state = stateDict[request.Id];
 
             lock (state)
             {
                 if (request.Sequence == state.SequenceNum)
                 {
-                    IPC[id.ToString()].ReceiveMessage(request.Message);
+                    IPC[request.Id].ReceiveMessage(request.Message);
                     state.SequenceNum++;
                 }
                 else
@@ -66,7 +63,7 @@ namespace PeakSWC.RemotePhotinoNET
 
                 while (state.MessageDictionary.ContainsKey(state.SequenceNum))
                 {
-                    IPC[id.ToString()].ReceiveMessage(state.MessageDictionary[state.SequenceNum].Message);
+                    IPC[request.Id].ReceiveMessage(state.MessageDictionary[state.SequenceNum].Message);
                     state.SequenceNum++;
                 }
             }
