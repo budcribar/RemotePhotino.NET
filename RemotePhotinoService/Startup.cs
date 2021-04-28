@@ -21,6 +21,7 @@ namespace PeakSWC.RemotePhotinoNET
         private readonly ConcurrentDictionary<string, ServiceState> rootDictionary = new();
         private readonly ConcurrentDictionary<string, IPC> ipcDictionary = new();
         private readonly Channel<ClientResponse> serviceStateChannel = Channel.CreateUnbounded<ClientResponse>();
+        private readonly ConcurrentDictionary<string, BrowserIPCState> state = new();
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -29,6 +30,7 @@ namespace PeakSWC.RemotePhotinoNET
             services.AddSingleton(ipcDictionary);
             services.AddSingleton(rootDictionary);
             services.AddSingleton(serviceStateChannel);
+            services.AddSingleton(state);
             services.AddResponseCompression(options => { options.MimeTypes.Concat(new[] { "application/octet-stream", "application/wasm" }); });
             services.AddGrpc();
 
