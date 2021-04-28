@@ -102,6 +102,12 @@ message StringRequest {
     string request = 2; 
 }
 
+message SendSequenceMessageRequest {
+    string id = 1;
+    uint32 sequence = 2;
+    string message = 3; 
+}
+
 message BoolRequest {
     string id = 1;
     bool request = 2;
@@ -172,7 +178,7 @@ service RemotePhotinoServiceProto {
 
 service BrowserIPC {
     rpc ReceiveMessage(IdMessageRequest) returns (stream StringRequest);
-    rpc SendMessage(StringRequest) returns (google.protobuf.Empty);
+    rpc SendMessage(SendSequenceMessageRequest) returns (google.protobuf.Empty);
     rpc GetHeight(IdMessageRequest) returns (IntMessageResponse);
 
 }

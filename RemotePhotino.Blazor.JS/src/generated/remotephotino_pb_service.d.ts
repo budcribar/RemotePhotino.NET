@@ -333,7 +333,7 @@ type BrowserIPCSendMessage = {
   readonly service: typeof BrowserIPC;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof remotephotino_pb.StringRequest;
+  readonly requestType: typeof remotephotino_pb.SendSequenceMessageRequest;
   readonly responseType: typeof google_protobuf_empty_pb.Empty;
 };
 
@@ -670,12 +670,12 @@ export class BrowserIPCClient {
   constructor(serviceHost: string, options?: grpc.RpcOptions);
   receiveMessage(requestMessage: remotephotino_pb.IdMessageRequest, metadata?: grpc.Metadata): ResponseStream<remotephotino_pb.StringRequest>;
   sendMessage(
-    requestMessage: remotephotino_pb.StringRequest,
+    requestMessage: remotephotino_pb.SendSequenceMessageRequest,
     metadata: grpc.Metadata,
     callback: (error: ServiceError|null, responseMessage: google_protobuf_empty_pb.Empty|null) => void
   ): UnaryResponse;
   sendMessage(
-    requestMessage: remotephotino_pb.StringRequest,
+    requestMessage: remotephotino_pb.SendSequenceMessageRequest,
     callback: (error: ServiceError|null, responseMessage: google_protobuf_empty_pb.Empty|null) => void
   ): UnaryResponse;
   getHeight(

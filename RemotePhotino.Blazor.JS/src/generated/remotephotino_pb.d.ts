@@ -474,6 +474,34 @@ export namespace StringRequest {
   }
 }
 
+export class SendSequenceMessageRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): void;
+
+  getSequence(): number;
+  setSequence(value: number): void;
+
+  getMessage(): string;
+  setMessage(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SendSequenceMessageRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: SendSequenceMessageRequest): SendSequenceMessageRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SendSequenceMessageRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SendSequenceMessageRequest;
+  static deserializeBinaryFromReader(message: SendSequenceMessageRequest, reader: jspb.BinaryReader): SendSequenceMessageRequest;
+}
+
+export namespace SendSequenceMessageRequest {
+  export type AsObject = {
+    id: string,
+    sequence: number,
+    message: string,
+  }
+}
+
 export class BoolRequest extends jspb.Message {
   getId(): string;
   setId(value: string): void;
