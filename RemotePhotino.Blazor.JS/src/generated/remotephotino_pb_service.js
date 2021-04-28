@@ -1302,7 +1302,7 @@ BrowserIPC.SendMessage = {
   service: BrowserIPC,
   requestStream: false,
   responseStream: false,
-  requestType: remotephotino_pb.StringRequest,
+  requestType: remotephotino_pb.SendSequenceMessageRequest,
   responseType: google_protobuf_empty_pb.Empty
 };
 
