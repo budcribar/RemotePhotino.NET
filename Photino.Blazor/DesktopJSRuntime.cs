@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
 using System;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Photino.Blazor
 
         public DesktopJSRuntime(IPC ipc)
         {
+            this.JsonSerializerOptions.Converters.Add(new ElementReferenceJsonConverter());
             _ipc = ipc ?? throw new ArgumentNullException(nameof(ipc));
         }
 

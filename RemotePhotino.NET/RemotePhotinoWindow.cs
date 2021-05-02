@@ -155,8 +155,9 @@ namespace PeakSWC.RemotePhotinoNET
                                                   var size = new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0);
                                                   this.InitSize = size;
                                                   // TODO don't throw size changed on initial set
-                                                  if (PlatformDispatcher != null)
-                                                      await PlatformDispatcher.InvokeAsync(() => {
+                                                  PlatformDispatcher? pd = PlatformDispatcher as PlatformDispatcher;
+                                                  if (pd != null)
+                                                      await pd.InvokeAsync(() => {
                                                           SizeChangedEvent?.Invoke(null, size);
                                                       });
 
@@ -169,8 +170,9 @@ namespace PeakSWC.RemotePhotinoNET
                                                   var jo = JsonConvert.DeserializeObject<JObject>(data.Replace("location:", ""));
                                                   var location = new Point(jo?["X"]?.Value<int>() ?? 0, jo?["Y"]?.Value<int>() ?? 0);
                                                   InitLocation = location;
-                                                  if (PlatformDispatcher != null)
-                                                      await PlatformDispatcher.InvokeAsync(() => {
+                                                  PlatformDispatcher? pd = PlatformDispatcher as PlatformDispatcher;
+                                                  if (pd != null)
+                                                      await pd.InvokeAsync(() => {
                                                           LocationChangedEvent?.Invoke(null, location);
                                                       });
                                               }
@@ -256,8 +258,8 @@ namespace PeakSWC.RemotePhotinoNET
 
         public uint ScreenDpi => 0;
 
-        public PlatformDispatcher? _PlatformDispatcher = null;
-        public PlatformDispatcher? PlatformDispatcher
+        public object? _PlatformDispatcher = null;
+        public object? PlatformDispatcher
         {
             get
             {

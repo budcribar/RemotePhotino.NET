@@ -21,7 +21,12 @@ namespace Photino.Blazor
         {
             try
             {
-                _photinoWindow.SendWebMessage($"{eventName}:{JsonSerializer.Serialize(args)}");
+                var pd = _photinoWindow.PlatformDispatcher as PlatformDispatcher;
+                pd.InvokeAsync(() =>
+                {
+                    _photinoWindow.SendWebMessage($"{eventName}:{JsonSerializer.Serialize(args)}");
+                });
+                
             }
             catch (Exception ex)
             {
