@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotino.NET", "RemotePhotino.NET.csproj", "{1F8C927A-DBDA-4FCB-AE25-C433FAB52D5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemotePhotinoService", "..\RemotePhotinoService\RemotePhotinoService.csproj", "{0194F0B6-94C3-42C3-B643-9348A65F930B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{252596B0-9826-4AA0-8ADB-A68F347FDC03} = {252596B0-9826-4AA0-8ADB-A68F347FDC03}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "..\UnitTests\UnitTests.csproj", "{CCCA5652-F4C4-432D-BC1E-09440B4CA40E}"
 EndProject
