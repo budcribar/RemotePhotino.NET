@@ -69,7 +69,7 @@ namespace Photino.Blazor
                 _thread.Start();
 
                 // TODO prevents deadlock but parallelization problems
-                new Thread(ProcessQueue).Start();
+                //new Thread(ProcessQueue).Start();
             }
 
             public BlockingCollection<WorkItem> Queue { get; } = new BlockingCollection<WorkItem>();
