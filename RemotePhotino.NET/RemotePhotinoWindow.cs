@@ -155,7 +155,7 @@ namespace PeakSWC.RemotePhotinoNET
                                                   var size = new Size(jo?["Width"]?.Value<int>() ?? 0, jo?["Height"]?.Value<int>() ?? 0);
                                                   this.InitSize = size;
                                                   // TODO don't throw size changed on initial set
-                                                  PlatformDispatcher? pd = PlatformDispatcher as PlatformDispatcher;
+                                                  IDispatcher? pd = PlatformDispatcher as PlatformDispatcher;
                                                   if (pd != null)
                                                       await pd.InvokeAsync(() => {
                                                           SizeChangedEvent?.Invoke(null, size);
@@ -258,30 +258,10 @@ namespace PeakSWC.RemotePhotinoNET
 
         public uint ScreenDpi => 0;
 
-        public object? _PlatformDispatcher = null;
-        public object? PlatformDispatcher
-        {
-            get
-            {
-                if (_PlatformDispatcher == null)
-                    _PlatformDispatcher = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "Dispatcher").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as PlatformDispatcher;
-                return _PlatformDispatcher;
-            }
-        }
+        public IDispatcher PlatformDispatcher { get; set; } 
 
-
-        private IJSRuntime? _JSRuntime = null;
-
-        public IJSRuntime? JSRuntime
-        {
-            get
-            {
-                if (_JSRuntime == null)
-                    _JSRuntime = typeof(ComponentsDesktop).GetProperties(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == "DesktopJSRuntime").FirstOrDefault()?.GetGetMethod(true)?.Invoke(null, null) as IJSRuntime;
-                return _JSRuntime;
-            }
-        }
-
+        public IJSRuntime? JSRuntime { get; set; }
+        
         private string InitTitle {set {_title = string.IsNullOrEmpty(value.Trim()) ? "Untitled Window" : value; } }
 
         private string _title;
@@ -1237,6 +1217,21 @@ namespace PeakSWC.RemotePhotinoNET
                 Console.WriteLine($"Executing: \"{this.Title ?? "RemotePhotinoWindow"}\".OnMWebessageReceived(string message)");
 
             this.WebMessageReceived?.Invoke(this, message);
+        }
+
+        public IPhotinoWindowBase OpenAlertWindowBase(string title, string message)
+        {
+            return OpenAlertWindow(title, message);
+        }
+
+        public IPhotinoWindowBase SendWebMessageBase(string message)
+        {
+            return SendWebMessage(message);
+        }
+
+        public IPhotinoWindowBase LoadBase(string path)
+        {
+            return Load(path);
         }
 
         #endregion

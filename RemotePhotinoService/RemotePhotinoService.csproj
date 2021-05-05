@@ -35,10 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!--
     <EmbeddedResource Include="..\RemotePhotinoClient\publish\wwwroot\**\*" LinkBase="wwwroot" />
      
@@ -48,6 +44,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 
 </Project>

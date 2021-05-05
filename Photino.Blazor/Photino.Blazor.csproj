@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\photino.NET\Photino.NET\Photino.NET.csproj" />
+    <ProjectReference Include="..\Photino.NET\Photino.NET.csproj" />
   </ItemGroup>
 
 </Project>

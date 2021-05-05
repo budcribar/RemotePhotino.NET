@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Microsoft.JSInterop.Infrastructure;
-using PhotinoNET;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using PhotinoNET;
 
 namespace Photino.Blazor
 {
@@ -22,10 +23,10 @@ namespace Photino.Blazor
         internal static string BaseUriAbsolute { get; private set; }
         internal static DesktopJSRuntime DesktopJSRuntime { get; private set; }
         internal static DesktopRenderer DesktopRenderer { get; private set; }
-        internal static IPhotinoWindow photinoWindow { get; private set; }
+        internal static IPhotinoWindowBase photinoWindow { get; private set; }
         internal static PlatformDispatcher Dispatcher { get; private set; }
 
-        public static void Run<TStartup>(IPhotinoWindow iphotinoWindow)
+        public static void Run<TStartup>(IPhotinoWindowBase iphotinoWindow)
         {
             //DesktopSynchronizationContext.UnhandledException += (sender, exception) =>
             //{
@@ -55,7 +56,7 @@ namespace Photino.Blazor
             try
             {
                 completed.Wait(); // TODO We need to wait for the new IPC to finish before trying to navigate
-                photinoWindow.Load(BlazorAppScheme + "://app/");
+                photinoWindow.LoadBase(BlazorAppScheme + "://app/");
                 photinoWindow.WaitForClose();
             }
             finally
@@ -64,11 +65,11 @@ namespace Photino.Blazor
             }
         }
 
-       
+
 
         public static Action<PhotinoWindowOptions> StandardOptions(string hostHtmlPath)
         {
-            return (options) => {
+            return (options) => { 
                 var contentRootAbsolute = Path.GetDirectoryName(Path.GetFullPath(hostHtmlPath));
 
                 options.CustomSchemeHandlers.Add(BlazorAppScheme, (string url, out string contentType) =>
@@ -122,8 +123,8 @@ namespace Photino.Blazor
         }
 
         private static void UnhandledException(Exception ex)
-        {
-            photinoWindow.OpenAlertWindow("Error", $"{ex.Message}\n{ex.StackTrace}");
+        { 
+            photinoWindow.OpenAlertWindowBase("Error", $"{ex.Message}\n{ex.StackTrace}");
         }
 
         private static async Task RunAsync<TStartup>(IPC ipc, CancellationToken appLifetime, ManualResetEventSlim completed)
@@ -138,9 +139,11 @@ namespace Photino.Blazor
             {
                 UnhandledException(exception);
             };
+            photinoWindow.PlatformDispatcher = Dispatcher;
 
 
             DesktopJSRuntime = new DesktopJSRuntime(ipc);
+            photinoWindow.JSRuntime = DesktopJSRuntime;
 
             completed.Set();
 
@@ -153,8 +156,10 @@ namespace Photino.Blazor
             serviceCollection.AddSingleton<NavigationManager>(DesktopNavigationManager.Instance);
             serviceCollection.AddSingleton<IJSRuntime>(DesktopJSRuntime);
             serviceCollection.AddSingleton<INavigationInterception, DesktopNavigationInterception>();
-            serviceCollection.AddSingleton(photinoWindow);
 
+            photinoWindow.GetType().GetInterfaces().Where(x => x.Name == nameof(IPhotinoWindowBase) | x.GetInterface(nameof(IPhotinoWindowBase)) != null).ToList().ForEach(x => 
+               serviceCollection.AddSingleton(x, photinoWindow));
+           
             var startup = new ConventionBasedStartup(Activator.CreateInstance(typeof(TStartup)));
             startup.ConfigureServices(serviceCollection);
 

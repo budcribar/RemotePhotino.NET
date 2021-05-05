@@ -2,13 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using PhotinoNET;
 
 namespace Photino.Blazor
 {
     /// <summary>
     /// A dispatcher that does not dispatch but invokes directly.
     /// </summary>
-    public class PlatformDispatcher : Dispatcher
+    public class PlatformDispatcher : Dispatcher, IDispatcher
     {
         private readonly DesktopSynchronizationContext context;
 

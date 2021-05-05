@@ -1,4 +1,5 @@
-﻿using PhotinoNET;
+﻿
+using PhotinoNET;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -9,9 +10,9 @@ namespace Photino.Blazor
     internal class IPC
     {
         private readonly Dictionary<string, List<Action<object>>> _registrations = new Dictionary<string, List<Action<object>>>();
-        private readonly IPhotinoWindow _photinoWindow;
+        private readonly IPhotinoWindowBase _photinoWindow;
 
-        public IPC(IPhotinoWindow photinoWindow)
+        public IPC(IPhotinoWindowBase photinoWindow)
         {
             _photinoWindow = photinoWindow ?? throw new ArgumentNullException(nameof(photinoWindow));
             _photinoWindow.WebMessageReceived += HandleScriptNotify;
@@ -24,7 +25,7 @@ namespace Photino.Blazor
                 var pd = _photinoWindow.PlatformDispatcher as PlatformDispatcher;
                 pd.InvokeAsync(() =>
                 {
-                    _photinoWindow.SendWebMessage($"{eventName}:{JsonSerializer.Serialize(args)}");
+                    _photinoWindow.SendWebMessageBase($"{eventName}:{JsonSerializer.Serialize(args)}");
                 });
                 
             }
