@@ -214,6 +214,7 @@ namespace PeakSWC.RemotePhotinoNET
 
                         await files.RequestStream.WriteAsync(new FileReadRequest { Id = Id.ToString(), Path = "Initialize" });
 
+                        // TODO Use multiple threads to read files - See RemoteableWindWindow.cs from RemoteBlazorWebView
                         await foreach (var message in files.ResponseStream.ReadAllAsync())
                         {
                             var bytes = FrameworkFileResolver(message.Path) ?? null;

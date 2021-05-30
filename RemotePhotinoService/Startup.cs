@@ -79,6 +79,7 @@ namespace PeakSWC.RemotePhotinoNET
             provider.Mappings[".wasm"] = "application/wasm";
             provider.Mappings[".woff"] = "application/font-woff";
             provider.Mappings[".woff2"] = "application/font-woff";
+            provider.Mappings[".ico"] = "image/x-icon";
 
             app.UseRewriter(new Microsoft.AspNetCore.Rewrite.RewriteOptions().AddRewrite("^wwwroot$", "wwwroot/index.html", false));
 
