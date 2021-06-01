@@ -19,29 +19,34 @@ namespace PeakSWC.RemotePhotinoNET
         private readonly ConcurrentDictionary<string, ServiceState> _webWindowDictionary;
         private readonly ConcurrentDictionary<string, IPC> _ipc;
         private readonly ConcurrentDictionary<string, byte[]> _fileCache = new();
+        private readonly ConcurrentDictionary<string, BrowserIPCState> _state;
         private readonly ILogger<RemotePhotinoService> _logger;
         private readonly Channel<ClientResponse> _serviceStateChannel;
 
-        public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc, Channel<ClientResponse> serviceStateChannel)
+        public RemotePhotinoService(ILogger<RemotePhotinoService> logger, ConcurrentDictionary<string, ServiceState> rootDictionary, ConcurrentDictionary<string, IPC> ipc, Channel<ClientResponse> serviceStateChannel, ConcurrentDictionary<string, BrowserIPCState> state)
         {
             _logger = logger;
             this._webWindowDictionary = rootDictionary;
             this._ipc = ipc;
             _serviceStateChannel = serviceStateChannel;
+            _state = state;
         }
         private void ExShutdown(string id)
         {
             _logger.LogInformation("Shutting down..." + id);
 
-            ServiceState? ss = new();
             if (_webWindowDictionary.ContainsKey(id))
-                _webWindowDictionary.Remove(id, out ss);
+                _webWindowDictionary.Remove(id, out var _);
 
             if (_ipc.ContainsKey(id))
                 _ipc.Remove(id, out var _);
 
             _serviceStateChannel.Writer.WriteAsync(new ClientResponse { AddClient = false, Id=id });
+
+            if (_state.ContainsKey(id))
+                _state.Remove(id, out var _);
         }
+
         public override async Task FileReader(IAsyncStreamReader<FileReadRequest> requestStream, IServerStreamWriter<FileReadResponse> responseStream, ServerCallContext context)
         {
             var id = "";
@@ -86,6 +91,7 @@ namespace PeakSWC.RemotePhotinoNET
                 // Client has shut down
             }
         }
+        
         public override async Task CreateWebWindow(CreateWebWindowRequest request, IServerStreamWriter<WebMessageResponse> responseStream, ServerCallContext context)
         {
             Debug.WriteLine($"https://localhost/app?guid={request.Id}");
